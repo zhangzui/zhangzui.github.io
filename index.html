@@ -1,0 +1,67 @@
+<link rel="stylesheet" href="/css/mos/orderDemo.css" />
+<div class="col-md-8 mos-body-mid">
+    <h3>商家开放平台概述</h3>
+    <hr>
+    <p>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;京东金融白条+商家开放平台是针对对接白条+各个业务的商家而准备的开发者文档的平台，开发者可以通过阅读本接口文档完成各个接口的
+        对接，从而简化开发。
+    </p>
+
+    <h5 id="index-1">
+        <b>一、注意事项：</b>
+    </h5>
+
+    <div class="preClass">
+    <p>1、本接口文档中所有接口的输入输出参数都必须使用我们的格式要求进行</p>
+       <p> 2、所有输入输出参数都是json格式</p>
+       <p> 3、所有接口中除了收单接口的参数使用表单post提交外都是使用json post提交的方式</p>
+       <p> 4、调试环境为测试环境，需按照要求配置host以及域名，正式上线后进行切换域名</p>
+      <p>  5、测试环境对接开发时，根据场景，我们有相应的测试商户号和秘钥，请下载下面的文档进行查看</p>
+      <p>  6、线上环境，请联系业务方配置线上的商户号和秘钥</p>
+      <p>  7、测试环境环境有时候不稳定，请须知。</p>
+    </div>
+
+    <hr>
+    <h5 id="index-2">
+        <b>二、典型流程：</b>
+    </h5>
+    <img style="width: 100%" src="/AccessMerchant/images/index.jpg"/><br>
+    <h5 id="index-2">
+        <b>几个重要流程介绍：</b>
+    </h5>
+    <div class="preClass">
+    <p>1、这是商家对接最重要的几个步骤，是大部分商家接入都要完成的对接工作;</p>
+    <p>2、这个流程包括几个重要的内容：收单、点对点、和代还款查询;（测试环境不支持真实支付）</p>
+    <p>3、收单：需要商家开发人员进行按文档要求组装参数，并调收单接口进行收单跳转;</p>
+    <p>4、点对点回调：商家开发好自己的接口，我们在贷款成功之后触发点对点回调，会将相应的贷款信息进行回传，这里需要注意的是，只有贷款完成之后才会触发;</p>
+    <p>5、待还款查询：有近七日代还款查询和全部代还款查询，根据商家需要进行接入。</p>
+    <p>6、完成收单之后，就可以开发点对点回调，最后进行代还款查询接口的对接！这三个基本的接口调通之后可以在线上环境进行测试，走流程！</p>
+    </div>
+    <br>
+
+    <h5 id="index-3">
+        <b>三、文档下载：</b>
+    </h5>
+    <div>
+        <a target="_blank" href="/AccessMerchant/sdkDoc/zf.doc">租房文档下载</a> |
+        <a target="_blank" href="/AccessMerchant/sdkDoc/edu.doc">教育文档下载</a> |
+        <a target="_blank" href="/AccessMerchant/sdkDoc/sfy.doc">旅游文档下载</a> |
+        <a target="_blank" href="/AccessMerchant/sdkDoc/jx.doc">驾校文档下载</a> |
+    </div>
+    <br>
+</div>
+<div class="col-md-2" id="myScrollspy">
+    <nav class="affix" data-toggle="affix" data-spy="affix" data-offset-top="50" data-offset-bottom="50">
+        <ul class="nav nav-tabs nav-stacked">
+            <li>
+                <a href="#index-1">一、注意事项</a>
+            </li>
+            <li>
+                <a href="#index-2">二、典型流程</a>
+            </li>
+            <li>
+                <a href="#index-3">三、文档下载</a>
+            </li>
+        </ul>
+    </nav>
+</div>
