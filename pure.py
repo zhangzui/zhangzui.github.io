@@ -37,7 +37,7 @@ class Post(object):
         if not self._title:
             title = re.findall("<h2>(.*?)</h2>", self.html)
             self._title = title[0] if title else filename(self.destfile).rsplit(".")[0]
-            print("self._title"+self._title)
+            print("self._title:"+self._title)
         return self._title
 
     def write(self):
@@ -104,6 +104,7 @@ jinja_env = Environment(loader=PackageLoader(__name__))
 
 # 文件输出地址,确定已经git init,可以直接git push origin master
 website_dir = "D:\\User\\zhangzuigit\\zhangzui.github.io"
+website_dir_html = "D:\\User\\zhangzuigit\\zhangzui.github.io\\html"
 website_dir_css = "D:\\User\\zhangzuigit\\zhangzui.github.io\\css"
 
 # 博客名字
