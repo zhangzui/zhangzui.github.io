@@ -37,6 +37,7 @@ class Post(object):
         if not self._title:
             title = re.findall("<h2>(.*?)</h2>", self.html)
             self._title = title[0] if title else filename(self.destfile).rsplit(".")[0]
+            print("self._title"+self._title)
         return self._title
 
     def write(self):
@@ -55,7 +56,7 @@ def all_post_file():
             # 设置忽略格式
             if f_name.startswith(".") or f_name.endswith(("pdf",)): continue
             post_path = join(root, f_name)
-            print(post_path)
+            print("post_path:"+post_path,"f_name:"+f_name)
             c_time = os.stat(post_path).st_ctime
             postlist.append((post_path, c_time))
     return sorted(postlist, key=lambda x:x[1], reverse=True)
@@ -65,7 +66,6 @@ def cover_all_post():
     post_basedir = join(root_dir, "post")
     postlist = []
     for (post_path, _) in all_post_file():
-        print(post_path)
         p = Post(post_path)
         p.write()
         print(p.title, p.url)
@@ -78,13 +78,14 @@ def cover_all_post():
 def copy_all_static():
     """拷贝 static/* 到 设置的website文件夹下"""
     base_websit = join(root_dir, "static")
+
     for root, dirs, files in os.walk(base_websit):
         relative_path = root.split(base_websit)[1].strip("/")
         for filename in files:
-            if not os.path.exists(join(website_dir, relative_path)):
-                os.makedirs(join(website_dir, relative_path))
+            if not os.path.exists(join(website_dir_css , relative_path)):
+                os.makedirs(join(website_dir_css , relative_path))
             shutil.copy(join(root, filename),
-                        join(website_dir, relative_path, filename))
+                        join(website_dir_css , relative_path, filename))
 
 
 def push_to_github():
@@ -95,18 +96,18 @@ def develop():
     """部署到github"""
     copy_all_static()
     cover_all_post()
-    push_to_github()
+    #push_to_github()
 
 
 root_dir = dirname(__file__)
 jinja_env = Environment(loader=PackageLoader(__name__))
 
 # 文件输出地址,确定已经git init,可以直接git push origin master
-# "/Users/xiaolin.zhang/UDocuments/github/Petelin.github.io"
 website_dir = "D:\\User\\zhangzuigit\\zhangzui.github.io"
+website_dir_css = "D:\\User\\zhangzuigit\\zhangzui.github.io\\css"
 
 # 博客名字
-jinja_env.globals["title"] = "zz-blog"
+jinja_env.globals["title"] = "zz-博客"
 
 # 博客图标
 jinja_env.globals["icon"] = "zz.jpg"

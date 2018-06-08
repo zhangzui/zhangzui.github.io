@@ -1,20 +1,8 @@
-<html>
-<head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=yes"/>
-    <link href="/css/main.css" rel="stylesheet" type="text/css">
-    <link href="/css/codehighlight.css" rel="stylesheet" type="text/css">
-    <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
-    <link rel="shortcut icon" href="/images/zz.jpg">
-    <title></title>
-</head>
-<body>
-  <div class="content">
-  <h1>数据连接池DPCP</h1>
-
-<p>参数介绍：</p>
-
-<pre><code>maxActive：一个时间最大的活跃连接数，负数代表没有上限
+#数据连接池
+##数据连接池介绍
+参数介绍：
+```
+maxActive：一个时间最大的活跃连接数，负数代表没有上限
 maxIdle：池中最大的空闲对象保持数，其他的将会释放，负数代表没有上限
 minIdle：池中最小的空闲对象保持数，其他的将会被创建，0代表不保持
 maxWait：当池耗尽时等待空闲对象的最长时间
@@ -28,52 +16,50 @@ maxOpenPreparedStatements = GenericKeyedObjectPool.DEFAULT_MAX_TOTAL （-1）:
 最大开放语句数声明池。 一个连接通常每次只使用一个或两个语句，这是主要用于帮助检测资源泄漏
 removeAbandonedTimeout:超时多少秒删除连接
 
-</code></pre>
-
-<p>BasicDataSource配置：</p>
-
-<pre><code> &lt;!-- datasource setting --&gt;
-    &lt;bean id="basicDataSource" class="org.apache.commons.dbcp.BasicDataSource" abstract="true"
-          init-method="createDataSource"&gt;
-        &lt;property name="driverClassName" value="com.mysql.jdbc.Driver"/&gt;
-        &lt;!-- 一个时间最大的活跃连接数，负数代表没有上限 --&gt;
-        &lt;property name="maxActive" value="10"/&gt;
-        &lt;!-- 池中空闲对象的最大数量 --&gt;
-        &lt;property name="maxIdle" value="10"/&gt;
-        &lt;!-- 池中空闲对象的最小数量 --&gt;
-        &lt;property name="minIdle" value="5"/&gt;
-        &lt;!-- 当池耗尽时等待空闲对象的最长时间 --&gt;
-        &lt;property name="maxWait" value="3000"/&gt;
-        &lt;!-- 池启动时创建的初始连接数 --&gt;
-        &lt;property name="initialSize" value="20"/&gt;
-        &lt;!-- 空闲时间：空闲对象被清除的时间间隔--&gt;
-        &lt;property name="timeBetweenEvictionRunsMillis" value="60000"/&gt;
-        &lt;!-- Statement pool true时包含PreparedStatements和CallableStatements --&gt;
-        &lt;property name="poolPreparedStatements" value="true"/&gt;
-        &lt;!-- 最大开放语句数声明池 --&gt;
-        &lt;property name="maxOpenPreparedStatements" value="50"/&gt;
-        &lt;!-- 超时多少秒删除连接 --&gt;
-        &lt;property name="removeAbandonedTimeout" value="180"/&gt;
-        &lt;!-- 申请连接时执行validationQuery检测连接是否有效，配置为true会降低性能 --&gt;
-        &lt;property name="testOnBorrow" value="false"/&gt;
-        &lt;!-- 归还连接时执行validationQuery检测连接是否有效，配置为true会降低性能  --&gt;
-        &lt;property name="testOnReturn" value="false"/&gt;
-        &lt;!-- 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于
-             timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。  --&gt;
-        &lt;property name="testWhileIdle" value="true"/&gt;
-        &lt;!-- 用来检测连接是否有效的sql，要求是一个查询语句,如果validationQuery为
-             null，testOnBorrow、testOnReturn、testWhileIdle都不起其作用。 --&gt;
-        &lt;property name="validationQuery" value="select 1;"/&gt;
-    &lt;/bean&gt;
-</code></pre>
-
-<p>自动检查连接的可用性，dbcp定时检测连接，dbcp自动重连的配置说明：
+```
+BasicDataSource配置：
+```
+ <!-- datasource setting -->
+    <bean id="basicDataSource" class="org.apache.commons.dbcp.BasicDataSource" abstract="true"
+          init-method="createDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <!-- 一个时间最大的活跃连接数，负数代表没有上限 -->
+        <property name="maxActive" value="10"/>
+        <!-- 池中空闲对象的最大数量 -->
+        <property name="maxIdle" value="10"/>
+        <!-- 池中空闲对象的最小数量 -->
+        <property name="minIdle" value="5"/>
+        <!-- 当池耗尽时等待空闲对象的最长时间 -->
+        <property name="maxWait" value="3000"/>
+        <!-- 池启动时创建的初始连接数 -->
+        <property name="initialSize" value="20"/>
+        <!-- 空闲时间：空闲对象被清除的时间间隔-->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- Statement pool true时包含PreparedStatements和CallableStatements -->
+        <property name="poolPreparedStatements" value="true"/>
+        <!-- 最大开放语句数声明池 -->
+        <property name="maxOpenPreparedStatements" value="50"/>
+        <!-- 超时多少秒删除连接 -->
+        <property name="removeAbandonedTimeout" value="180"/>
+        <!-- 申请连接时执行validationQuery检测连接是否有效，配置为true会降低性能 -->
+        <property name="testOnBorrow" value="false"/>
+        <!-- 归还连接时执行validationQuery检测连接是否有效，配置为true会降低性能  -->
+        <property name="testOnReturn" value="false"/>
+        <!-- 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于
+             timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。  -->
+        <property name="testWhileIdle" value="true"/>
+        <!-- 用来检测连接是否有效的sql，要求是一个查询语句,如果validationQuery为
+             null，testOnBorrow、testOnReturn、testWhileIdle都不起其作用。 -->
+        <property name="validationQuery" value="select 1;"/>
+    </bean>
+```
+自动检查连接的可用性，dbcp定时检测连接，dbcp自动重连的配置说明：
 maxIdle值与maxActive值应配置的接近。
 因为，当连接数超过maxIdle值后，刚刚使用完的连接（刚刚空闲下来）会立即被销毁。而不是我想要的空闲M秒后再销毁起一个缓冲作用。这一点DBCP做的可能与你想像的不一样。
 若maxIdle与maxActive相差较大，在高负载的系统中会导致频繁的创建、销毁连接，连接数在maxIdle与maxActive间快速频繁波动，这不是我想要的。
-高负载系统的maxIdle值可以设置为与maxActive相同或设置为-1(-1表示不限制)，让连接数量在minIdle与maxIdle间缓冲慢速波动。</p>
+高负载系统的maxIdle值可以设置为与maxActive相同或设置为-1(-1表示不限制)，让连接数量在minIdle与maxIdle间缓冲慢速波动。
 
-<p>timeBetweenEvictionRunsMillis建议设置值
+timeBetweenEvictionRunsMillis建议设置值
 initialSize="5"，会在tomcat一启动时，创建5条连接，效果很理想。
 但同时我们还配置了minIdle="10"，也就是说，最少要保持10条连接，那现在只有5条连接，哪什么时候再创建少的5条连接呢？
 1、等业务压力上来了， DBCP就会创建新的连接。
@@ -84,25 +70,24 @@ initialSize="5"，会在tomcat一启动时，创建5条连接，效果很理想�
     testOnBorrow = "false"   借出连接时不要测试，否则很影响性能
     timeBetweenEvictionRunsMillis = "30000"  每30秒运行一次空闲连接回收器
     minEvictableIdleTimeMillis = "1800000"  池中的连接空闲30分钟后被回收,默认值就是30分钟。
-    numTestsPerEvictionRun="3" 在每次空闲连接回收器线程(如果有)运行时检查的连接数量，默认值就是3.</p>
+    numTestsPerEvictionRun="3" 在每次空闲连接回收器线程(如果有)运行时检查的连接数量，默认值就是3.
 
-<pre><code>解释：
-配置timeBetweenEvictionRunsMillis = "30000"后，每30秒运行一次空闲连接回收器（独立线程）。并每次检查3个连接，如果连接空闲时间超过30分钟就销毁。销毁连接后，连接数量就少了，如果小于minIdle数量，就新建连接，维护数量不少于minIdle，过行了新老更替。
-testWhileIdle = "true" 表示每30秒，取出3条连接，使用validationQuery = "SELECT 1" 中的SQL进行测试 ，测试不成功就销毁连接。销毁连接后，连接数量就少了，如果小于minIdle数量，就新建连接。
-testOnBorrow = "false" 一定要配置，因为它的默认值是true。false表示每次从连接池中取出连接时，不需要执行validationQuery = "SELECT 1" 中的SQL进行测试。若配置为true,对性能有非常大的影响，性能会下降7-10倍。所在一定要配置为false.
-每30秒，取出numTestsPerEvictionRun条连接（本例是3，也是默认值），发出"SELECT 1" SQL语句进行测试 ，测试过的连接不算是“被使用”了，还算是空闲的。连接空闲30分钟后会被销毁。
-</code></pre>
+    解释：
+    配置timeBetweenEvictionRunsMillis = "30000"后，每30秒运行一次空闲连接回收器（独立线程）。并每次检查3个连接，如果连接空闲时间超过30分钟就销毁。销毁连接后，连接数量就少了，如果小于minIdle数量，就新建连接，维护数量不少于minIdle，过行了新老更替。
+    testWhileIdle = "true" 表示每30秒，取出3条连接，使用validationQuery = "SELECT 1" 中的SQL进行测试 ，测试不成功就销毁连接。销毁连接后，连接数量就少了，如果小于minIdle数量，就新建连接。
+    testOnBorrow = "false" 一定要配置，因为它的默认值是true。false表示每次从连接池中取出连接时，不需要执行validationQuery = "SELECT 1" 中的SQL进行测试。若配置为true,对性能有非常大的影响，性能会下降7-10倍。所在一定要配置为false.
+    每30秒，取出numTestsPerEvictionRun条连接（本例是3，也是默认值），发出"SELECT 1" SQL语句进行测试 ，测试过的连接不算是“被使用”了，还算是空闲的。连接空闲30分钟后会被销毁。
 
-<h2>1、创建数据源：createDataSource</h2>
+##1、创建数据源：createDataSource
 
-<pre><code>a.创建drive工厂：createConnectionFactory
-b.创建GenericObjectPool connectionPool;
-c.statementPoolFactory:GenericKeyedObjectPoolFactory
-d.创建DataSource实例:
-PoolingDataSource pds = new PoolingDataSource(connectionPool);
-</code></pre>
+    a.创建drive工厂：createConnectionFactory
+    b.创建GenericObjectPool connectionPool;
+    c.statementPoolFactory:GenericKeyedObjectPoolFactory
+    d.创建DataSource实例:
+    PoolingDataSource pds = new PoolingDataSource(connectionPool);
 
-<pre><code>//创建数据源
+```
+//创建数据源
 protected synchronized DataSource createDataSource()
         throws SQLException {
         //如果closed标识为关闭，直接抛异常
@@ -152,7 +137,7 @@ protected synchronized DataSource createDataSource()
 
         // 初始化 为连接池中添加PoolableConnection
         try {
-            for (int i = 0 ; i &lt; initialSize ; i++) {
+            for (int i = 0 ; i < initialSize ; i++) {
                 connectionPool.addObject();
             }
         } catch (Exception e) {
@@ -161,11 +146,10 @@ protected synchronized DataSource createDataSource()
 
         return dataSource;
     }
-</code></pre>
-
-<p>初始化添加连接：</p>
-
-<pre><code> public void addObject() throws Exception {
+```
+初始化添加连接：
+```
+ public void addObject() throws Exception {
         assertOpen();
         if (_factory == null) {
             throw new IllegalStateException("Cannot add objects without a factory.");
@@ -197,15 +181,14 @@ protected synchronized DataSource createDataSource()
             }
             return new PoolableConnection(conn,_pool,_config);
         }
-</code></pre>
-
-<p>保存链接的数据结构：CursorableLinkedList _pool</p>
-
-<pre><code>   synchronized (this) {
+```
+保存链接的数据结构：CursorableLinkedList _pool
+```
+   synchronized (this) {
                if (isClosed()) {
                    shouldDestroy = true;
                } else {
-                   if((_maxIdle &gt;= 0) &amp;&amp; (_pool.size() &gt;= _maxIdle)) {
+                   if((_maxIdle >= 0) && (_pool.size() >= _maxIdle)) {
                        shouldDestroy = true;
                    } else if(success) {
                        // borrowObject always takes the first element from the queue,
@@ -223,11 +206,11 @@ protected synchronized DataSource createDataSource()
                }
            }
 
-</code></pre>
+```
 
-<h2>二、使用DataSource获取连接：PoolingDataSource</h2>
-
-<pre><code>public Connection getConnection() throws SQLException {
+##二、使用DataSource获取连接：PoolingDataSource
+```
+public Connection getConnection() throws SQLException {
         try {
             Connection conn = (Connection)(_pool.borrowObject());
             if (conn != null) {
@@ -244,19 +227,16 @@ protected synchronized DataSource createDataSource()
             throw new SQLNestedException("Cannot get a connection, general error", e);
         }
     }
-</code></pre>
+```
+borrowObject方法：
+```
 
-<p>borrowObject方法：</p>
-
-<pre><code>
-</code></pre>
-
-<h2>三、连接池：</h2>
-
-<pre><code>protected volatile GenericObjectPool connectionPool = null;
-</code></pre>
-
-<p>apache的common-pool工具库中有5种对象池:GenericObjectPool和GenericKeyedObjectPool,
+```
+##三、连接池：
+```
+protected volatile GenericObjectPool connectionPool = null;
+```
+apache的common-pool工具库中有5种对象池:GenericObjectPool和GenericKeyedObjectPool,
 SoftReferenceObjectPool, StackObjectPool, StackKeyedObjectPool.
 五种对象池可分为两类, 一类是无key的:
 前面两种用CursorableLinkedList来做容器, SoftReferenceObjectPool用ArrayList做容器, 一次性创建所有池化对象,
@@ -266,25 +246,23 @@ SoftReferenceObjectPool, StackObjectPool, StackKeyedObjectPool.
    之所以需要带key的这种对象池, 是因为普通的对象池通过makeObject()方法创建的对象基本上都是一模一样的, 因为没法传递参数来对池对象进行定制.
    因此四种池对象的区别主要体现在内部的容器的区别, Stack遵循"后进先出"的原则并能保证线程安全,
     CursorableLinkedList是一个内部用游标(cursor)来定位当前元素的双向链表, 是非线程安全的, 但是能满足对容器的并发修改.
-    ArrayList是非线程安全的, 遍历方便的容器.</p>
+    ArrayList是非线程安全的, 遍历方便的容器.
 
-<p>使用对象池的一般步骤:创建一个池对象工厂, 将该工厂注入到对象池中, 当要取池对象, 调用borrowObject,
-当要归还池对象时, 调用returnObject, 销毁池对象调用clear(), 如果要连池对象工厂也一起销毁, 则调用close().</p>
+使用对象池的一般步骤:创建一个池对象工厂, 将该工厂注入到对象池中, 当要取池对象, 调用borrowObject,
+当要归还池对象时, 调用returnObject, 销毁池对象调用clear(), 如果要连池对象工厂也一起销毁, 则调用close().
 
-<p>而对应的对象池前者采用的是ObjectPool, 后者是KeyedObjectPool, 因为一个数据库只对应一个连接, 而执行操作的Statement却根据Sql的不同会分很多种.
+而对应的对象池前者采用的是ObjectPool, 后者是KeyedObjectPool, 因为一个数据库只对应一个连接, 而执行操作的Statement却根据Sql的不同会分很多种.
  因此需要根据sql语句的不同多次进行缓存
 在对连接池的管理上, common-dbcp主要采用两种对象:
 一个是PoolingDriver, 另一个是PoolingDataSource, 二者的区别是PoolingDriver是一个更底层的操作类, 它持有一个连接池映射列表,
-一般针对在一个jvm中要连接多个数据库, 而后者相对简单一些. 内部只能持有一个连接池, 即一个数据源对应一个连接池.</p>
+一般针对在一个jvm中要连接多个数据库, 而后者相对简单一些. 内部只能持有一个连接池, 即一个数据源对应一个连接池.
 
-<p>整个数据源最核心的其实就三个东西：
+整个数据源最核心的其实就三个东西：
 一个是连接池，在这里体现为common-pool中的GenericObjectPool，它负责缓存和管理连接，所有的配置策略都是由它管理。
 第二个是连接，这里的连接就是PoolableConnection，当然它是对底层连接进行了封装。
-第三个则是连接池和连接的关系，在此表现为一对多的互相引用。对数据源的构建则是对连接池，连接以及连接池与连接的关系的构建。</p>
-
-<h2>三、参考资料</h2>
-
-<p>BasicDataSource
+第三个则是连接池和连接的关系，在此表现为一对多的互相引用。对数据源的构建则是对连接池，连接以及连接池与连接的关系的构建。
+##三、参考资料
+BasicDataSource
 https://blog.csdn.net/kang389110772/article/details/52572930
 深入理解JDBC的timeout
 https://blog.csdn.net/kobejayandy/article/details/46916063
@@ -292,17 +270,4 @@ https://blog.csdn.net/kobejayandy/article/details/46916063
 https://blog.csdn.net/suixinm/article/details/41761019
 mysql参数配置
 https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html
-```</p>
-
-  </div>
-</body>
-<!-- Global Site Tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-106796420-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments)};
-  gtag('js', new Date());
-  gtag('config', 'UA-106796420-1');
-</script>
-
-</html>
+```
