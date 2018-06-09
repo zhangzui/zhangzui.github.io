@@ -60,9 +60,6 @@
             -webkit-margin-start: 0px;
             -webkit-margin-end: 0px;
         }
-        .myclass_style{
-            color: #a78918;
-        }
     </style>
 </head>
 
@@ -97,7 +94,8 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
-                <li class="active"><a href="#">Blog</a></li>
+                <li class="active"><a href="#">网站</a></li>
+                <li class="active"><a href="#">关于自己</a></li>
                 {% for social in sociallist %}
                     <li><a href="{{ social[1] }}">{{ social[0] }}</a></li>
                 {% endfor %}
@@ -114,10 +112,25 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Blog</h3>
                 </div>
-                <ul class="list-group">
+                <ul class="list-group" style="padding: 10px !important;">
                     {% for post in postlist %}
-                        <li class="list-group-item title">
-                            <a href="{{ post.url }}">{{ post.title }}</a>
+                    <li class="list-group-item title">
+                      <span class="pinned-repo-item-content">
+                            <span class="d-block">
+                                <a href="{{ post.url }}"class="text-bold">
+                                    <span class="repo js-repo" title="apollo">{{ post.title }}</span>
+                                </a>
+                            </span>
+                            <div style="float:left;border:1px; width:100%;height: auto">
+                                <div style="float:left;border:1px ; width:30%; ">
+                                    <img style="width: 80%;height: 180px" class="qr_code_pc_img" src="./images{{ post.image }}.jpg">
+                                </div>
+                                <div style="float:left;border:1px  ;width:60%; ">
+                                    <p class="pinned-repo-desc text-gray text-small d-block mt-2 mb-3">Apollo（阿波罗）是携程框架部门研发的分布式配置中心，能够集中化管理应用不同环境、不同集群的配置，配置修改后能够实时推送到应用端，并且具备规范的权限、流程治理等特性，适用于微服务配置管理场景。</p>
+                                </div>
+                            </div>
+                            <b>标签：Java </b>
+                            </span>
                         </li>
                     {% endfor %}
                 </ul>

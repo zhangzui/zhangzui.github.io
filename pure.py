@@ -20,16 +20,15 @@ class Post(object):
         self.url = pathname2url(self.destfile.split(website_dir)[1])
         self._html = None
         self._title = None
+        self._image = None
 
     @property
     def html(self):
         if not self._html:
             with open(self.fromfile,'r',encoding='UTF-8') as f:
-                self._html = markdown2.markdown(f.read(),
-                                                extras=['fenced-code-blocks', 'footnotes'])
+                self._html = markdown2.markdown(f.read(),extras=['fenced-code-blocks', 'footnotes'])
                 c = re.compile("<p>(\\n)+</p>")
                 self._html = re.sub(c, '</br>', self._html)
-                print("------------")
         return self._html
 
     @property
@@ -39,6 +38,14 @@ class Post(object):
             self._title = title[0] if title else filename(self.destfile).rsplit(".")[0]
             print("self._title:"+self._title)
         return self._title
+
+    @property
+    def image(self):
+        if not self._image:
+            title = re.findall("<h2>(.*?)</h2>", self.html)
+            self._image = self.url.rsplit(".")[0]
+            print("self._image:"+self._image)
+        return self._image
 
     def write(self):
         if not os.path.exists(dirname(self.destfile)):
@@ -56,7 +63,7 @@ def all_post_file():
             # 设置忽略格式
             if f_name.startswith(".") or f_name.endswith(("pdf",)): continue
             post_path = join(root, f_name)
-            print("post_path:"+post_path,"f_name:"+f_name)
+            print("post_path:ppppppppppp"+post_path,"f_name:"+f_name)
             c_time = os.stat(post_path).st_ctime
             postlist.append((post_path, c_time))
     return sorted(postlist, key=lambda x:x[1], reverse=True)
@@ -68,7 +75,7 @@ def cover_all_post():
     for (post_path, _) in all_post_file():
         p = Post(post_path)
         p.write()
-        print(p.title, p.url)
+        print("--------"+p.title, p.url, p.image)
         postlist.append(p)
     index_t = jinja_env.get_template("index.html")
     with open(join(website_dir, "index.html"), "w",encoding='UTF-8') as fd:
@@ -115,6 +122,5 @@ jinja_env.globals["icon"] = "zz.jpg"
 
 # 直接添加名字和地址
 jinja_env.globals["sociallist"] = (("github", "https://github.com/zhangzui"),)
-
 if __name__ == "__main__":
     develop()
