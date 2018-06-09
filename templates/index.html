@@ -11,10 +11,76 @@
     <link rel="shortcut icon" href="/images/zz.jpg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=yes"/>
     <title>{{ title }}</title>
+    <style>
+
+        .not_in_mm .qr_code_pc_img {
+            width: 102px;
+            height: 102px;
+        }
+        .not_in_mm .qr_code_pc {
+            position: absolute;
+            right: -150px;
+            top: 50px;
+            width: 150px;
+            padding: 16px;
+            border: 1px solid #d9dadc;
+            background-color: #fff;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+        .not_in_mm .qr_code_pc_1 {
+            position: absolute;
+            right: 740px;
+            top: 50px;
+            width: 150px;
+            padding: 16px;
+            border: 1px solid #d9dadc;
+            background-color: #fff;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+        .not_in_mm .qr_code_pc_inner {
+            position: relative;
+            width: 740px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .not_in_mm .qr_code_pc_outer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 20px;
+            color: #717375;
+            text-align: center;
+        }
+        p {
+            display: block;
+            -webkit-margin-before: 1em;
+            -webkit-margin-after: 1em;
+            -webkit-margin-start: 0px;
+            -webkit-margin-end: 0px;
+        }
+        .myclass_style{
+            color: #a78918;
+        }
+    </style>
 </head>
 
 <body>
-
+<div class="not_in_mm">
+    <div id="js_pc_qr_code" class="qr_code_pc_outer">
+        <div class="qr_code_pc_inner">
+            <div class="qr_code_pc_1">
+                <img  class="qr_code_pc_img" src="./images/zz.jpg">
+                <p>热爱生活，热爱运动</p>
+            </div>
+            <div class="qr_code_pc">
+                <img class="qr_code_pc_img" src="./images/myclass.jpg">
+                <p>微信扫一扫<br>关注该公众号</p>
+            </div>
+        </div>
+    </div>
+</div>
 <nav class="navbar navbar-default navbar-fixed-top" style="opacity: .9" role="navigation">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->

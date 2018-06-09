@@ -108,7 +108,7 @@ website_dir_html = "D:\\User\\zhangzuigit\\zhangzui.github.io\\html"
 website_dir_css = "D:\\User\\zhangzuigit\\zhangzui.github.io\\css"
 
 # 博客名字
-jinja_env.globals["title"] = "zz-博客"
+jinja_env.globals["title"] = "Myclass社区博客"
 
 # 博客图标
 jinja_env.globals["icon"] = "zz.jpg"
