@@ -1,6 +1,7 @@
 # my-sharding-jdbc
 ## my-sharding-jdbc简介
-​	 ShardingJDBC001简单的例子，配置信息的初始化，等
+
+ShardingJDBC001简单的例子，配置信息的初始化,以及源码解析
 
 ## 使用示例
 ShardingJDBC
