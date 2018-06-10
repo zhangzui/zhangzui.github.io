@@ -20,8 +20,8 @@ from pygments.formatters import HtmlFormatter
 import markdown2
 from jinja2 import PackageLoader, Environment
 
-
 class Post(object):
+    #初始化self对象
     def __init__(self, from_file):
         if not os.path.isfile(from_file): raise RuntimeError("not a file")
         self.fromfile = from_file
@@ -35,7 +35,7 @@ class Post(object):
         self._abstract = None
         self.lexer = get_lexer_by_name("java", stripall=True)
         self.formatter = HtmlFormatter()
-
+    #html属性
     @property
     def html(self):
         if not self._html:
@@ -51,7 +51,7 @@ class Post(object):
                 self._html = re.sub(c, '</br>', self._html)
                 #print("self._html:"+self._html)
         return self._html
-
+    #摘要属性
     @property
     def abstract(self):
         if not self._abstract:
@@ -59,7 +59,7 @@ class Post(object):
              self._abstract = abstract[0] if abstract else filename(self.destfile).rsplit(".")[0]
              #print("self._abstract:"+self._abstract)
         return self._abstract
-
+    #摘要属性
     @property
     def title(self):
         if not self._title:
@@ -67,7 +67,7 @@ class Post(object):
             self._title = title[0] if title else filename(self.destfile).rsplit(".")[0]
             #print("self._title:"+self._title)
         return self._title
-
+    #图片属性
     @property
     def image(self):
         if not self._image:
@@ -76,7 +76,7 @@ class Post(object):
                self._image = "/java"
             print("self._image1222222:"+self._image)
         return self._image
-
+    #生成html文件
     def write(self):
         if not os.path.exists(dirname(self.destfile)):
             os.makedirs(dirname(self.destfile))
@@ -97,6 +97,7 @@ def all_post_file():
             postlist.append((post_path, c_time))
     return sorted(postlist, key=lambda x:x[1], reverse=True)
 
+
 def cover_all_post():
     """create posts html format and make up index.html"""
     post_basedir = join(root_dir, "post")
@@ -110,11 +111,9 @@ def cover_all_post():
     with io.open(join(website_dir, "index.html"), "w",encoding='UTF-8') as fd:
         fd.write(index_t.render(postlist=postlist))
 
-
+#拷贝 static/* 到 设置的website文件夹下
 def copy_all_static():
-    """拷贝 static/* 到 设置的website文件夹下"""
     base_websit = join(root_dir, "static")
-
     for root, dirs, files in os.walk(base_websit):
         relative_path = root.split(base_websit)[1].strip("/")
         for filename in files:
@@ -123,17 +122,13 @@ def copy_all_static():
             shutil.copy(join(root, filename),
                         join(website_dir_css , relative_path, filename))
 
-
+#提交git
 def push_to_github():
     os.system("""cd %s && git add * && git commit -m "update" && git push origin master""" % website_dir)
-
-
+#部署到github
 def develop():
-    """部署到github"""
     copy_all_static()
     cover_all_post()
-    #push_to_github()
-
 
 root_dir = dirname(__file__)
 jinja_env = Environment(loader=PackageLoader(__name__))
@@ -150,10 +145,8 @@ website_dir_image = "/usr/zzone/zzgit/zhangzui.github.io/images"
 
 # 博客名字
 jinja_env.globals["title"] = "Myclass社区"
-
 # 博客图标
 jinja_env.globals["icon"] = "zz.jpg"
-
 # 直接添加名字和地址
 jinja_env.globals["sociallist"] = (("github", "https://github.com/zhangzui"),)
 if __name__ == "__main__":
