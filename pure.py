@@ -57,7 +57,7 @@ class Post(object):
         if not self._abstract:
              abstract = re.findall("<p>(.*?)</p>", self.html,re.S)
              self._abstract = abstract[0] if abstract else filename(self.destfile).rsplit(".")[0]
-             print("self._abstract:"+self._abstract)
+             #print("self._abstract:"+self._abstract)
         return self._abstract
 
     @property
@@ -65,14 +65,16 @@ class Post(object):
         if not self._title:
             title = re.findall("<h1>(.*?)</h1>", self.html)
             self._title = title[0] if title else filename(self.destfile).rsplit(".")[0]
-            print("self._title:"+self._title)
+            #print("self._title:"+self._title)
         return self._title
 
     @property
     def image(self):
         if not self._image:
             self._image = self.url.rsplit(".")[0]
-            print("self._image:"+self._image)
+            if not os.path.exists(website_dir_image+self._image+".jpg"):
+               self._image = "/java"
+            print("self._image1222222:"+self._image)
         return self._image
 
     def write(self):
@@ -102,7 +104,7 @@ def cover_all_post():
     for (post_path, _) in all_post_file():
         p = Post(post_path)
         p.write()
-        print("--------"+p.title, p.url, p.image, p.abstract)
+        #print("--------"+p.title, p.url, p.image, p.abstract)
         postlist.append(p)
     index_t = jinja_env.get_template("index.html")
     with io.open(join(website_dir, "index.html"), "w",encoding='UTF-8') as fd:
@@ -144,6 +146,7 @@ jinja_env = Environment(loader=PackageLoader(__name__))
 website_dir = "/usr/zzone/zzgit/zhangzui.github.io"
 website_dir_html = "/usr/zzone/zzgit/zhangzui.github.io/html"
 website_dir_css = "/usr/zzone/zzgit/zhangzui.github.io/css"
+website_dir_image = "/usr/zzone/zzgit/zhangzui.github.io/images"
 
 # 博客名字
 jinja_env.globals["title"] = "Myclass社区"

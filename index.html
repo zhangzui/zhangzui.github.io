@@ -112,100 +112,199 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Blog</h3>
                 </div>
-                <ul class="list-group" style="padding: 10px !important;">
-                    
-                    <li class="list-group-item title">
-                      <span class="pinned-repo-item-content">
-                            <span class="d-block">
-                                <a href="/ThreadPoolExecutor.html"class="text-bold">
-                                    <span class="repo js-repo" title="apollo">深入理解Java线程池：</span>
-                                </a>
-                            </span>
-                            <div style="float:left;border:1px; width:100%;height: auto">
-                                <div style="float:left;border:1px ; width:30%; ">
-                                    <img style="height: 180px;width:180px" class="qr_code_pc_img" src="./images/ThreadPoolExecutor.jpg">
-                                </div>
-                                <div style="float:left;border:1px  ;width:60%; ">
-                                    <p class="pinned-repo-desc text-gray text-small d-block mt-2 mb-3">Java中的线程池是用ThreadPoolExecutor类来实现的. 本文就结合JDK 1.8对该类的源码来分析一下这个类内部对于线程的创建, 管理以及后台任务的调度等方面的执行原理。</p>
-                                </div>
-                            </div>
-                            <b>标签：Java </b>
-                            </span>
-                        </li>
-                    
-                    <li class="list-group-item title">
-                      <span class="pinned-repo-item-content">
-                            <span class="d-block">
-                                <a href="/sharding-jdbc.html"class="text-bold">
-                                    <span class="repo js-repo" title="apollo">my-sharding-jdbc</span>
-                                </a>
-                            </span>
-                            <div style="float:left;border:1px; width:100%;height: auto">
-                                <div style="float:left;border:1px ; width:30%; ">
-                                    <img style="height: 180px;width:180px" class="qr_code_pc_img" src="./images/sharding-jdbc.jpg">
-                                </div>
-                                <div style="float:left;border:1px  ;width:60%; ">
-                                    <p class="pinned-repo-desc text-gray text-small d-block mt-2 mb-3">ShardingJDBC001简单的例子，配置信息的初始化,以及源码解析</p>
-                                </div>
-                            </div>
-                            <b>标签：Java </b>
-                            </span>
-                        </li>
-                    
-                    <li class="list-group-item title">
-                      <span class="pinned-repo-item-content">
-                            <span class="d-block">
-                                <a href="/databasepool.html"class="text-bold">
-                                    <span class="repo js-repo" title="apollo">DBCP数据连接池</span>
-                                </a>
-                            </span>
-                            <div style="float:left;border:1px; width:100%;height: auto">
-                                <div style="float:left;border:1px ; width:30%; ">
-                                    <img style="height: 180px;width:180px" class="qr_code_pc_img" src="./images/databasepool.jpg">
-                                </div>
-                                <div style="float:left;border:1px  ;width:60%; ">
-                                    <p class="pinned-repo-desc text-gray text-small d-block mt-2 mb-3">DBCP数据连接池参数介绍，相关配置，和DBCP是如何创建数据源，如何缓存和管理连接池的；最核心的部分，一个是连接池，第二个是连接，第三个则是连接池和连接的关系，在此表现为一对多的互相引用。</p>
-                                </div>
-                            </div>
-                            <b>标签：Java </b>
-                            </span>
-                        </li>
-                    
-                    <li class="list-group-item title">
-                      <span class="pinned-repo-item-content">
-                            <span class="d-block">
-                                <a href="/java.html"class="text-bold">
-                                    <span class="repo js-repo" title="apollo">java开发老司机心得</span>
-                                </a>
-                            </span>
-                            <div style="float:left;border:1px; width:100%;height: auto">
-                                <div style="float:left;border:1px ; width:30%; ">
-                                    <img style="height: 180px;width:180px" class="qr_code_pc_img" src="./images/java.jpg">
-                                </div>
-                                <div style="float:left;border:1px  ;width:60%; ">
-                                    <p class="pinned-repo-desc text-gray text-small d-block mt-2 mb-3">转自朋友圈并经过细节优化和整理，分享给大家，也提醒自己。如有雷同，纯属抄袭。</p>
-                                </div>
-                            </div>
-                            <b>标签：Java </b>
-                            </span>
-                        </li>
-                    
+                <ul class="list-group" style="padding: 10px !important;" id="list_ul">
+
                 </ul>
             </div>
+            <div>
+                <div id="page_ul" style="align-content: center;    width: fit-content;    margin: auto;">
+                </div>
+            </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2" align="center">
+
         </div>
     </div>
 </div>
-<script src="/js/bootstrap.min.js"></script>
+<script src="./js/bootstrap.min.js"></script>
 <!-- Global Site Tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-106796420-1"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments)};
   gtag('js', new Date());
-  
     gtag('config', 'UA-106796420-1');
+
+    var objectArray =new Array();;
+    
+        var obejct = {
+            "url":"/ThreadPoolExecutor.html",
+            "title":"深入理解Java线程池：",
+            "image":"/ThreadPoolExecutor",
+            "abstract":"Java中的线程池是用ThreadPoolExecutor类来实现的. 本文就结合JDK 1.8对该类的源码来分析一下这个类内部对于线程的创建, 管理以及后台任务的调度等方面的执行原理。"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/sharding-jdbc.html",
+            "title":"my-sharding-jdbc",
+            "image":"/sharding-jdbc",
+            "abstract":"ShardingJDBC001简单的例子，配置信息的初始化,以及源码解析"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/java.html",
+            "title":"java开发老司机心得",
+            "image":"/java",
+            "abstract":"转自朋友圈并经过细节优化和整理，分享给大家，也提醒自己。如有雷同，纯属抄袭。"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/databasepool.html",
+            "title":"DBCP数据连接池",
+            "image":"/databasepool",
+            "abstract":"DBCP数据连接池参数介绍，相关配置，和DBCP是如何创建数据源，如何缓存和管理连接池的；最核心的部分，一个是连接池，第二个是连接，第三个则是连接池和连接的关系，在此表现为一对多的互相引用。"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/aliyun.html",
+            "title":"阿里云软件安装",
+            "image":"/java",
+            "abstract":"阿里云软件安装"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/linux_commod.html",
+            "title":"linux常用命令介绍",
+            "image":"/java",
+            "abstract":"linux常用命令介绍"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/jvm_preform.html",
+            "title":"JVM优化",
+            "image":"/java",
+            "abstract":"JVM优化"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/JVM_classload.html",
+            "title":"java类加载器",
+            "image":"/java",
+            "abstract":"生成class文件格式：javap -verbose TestVolatile &gt; TestVolatile.txt"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/jdbcpool.html",
+            "title":"数据连接池DPCP",
+            "image":"/java",
+            "abstract":"数据连接池DPCP"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/jdbc_timeout.html",
+            "title":"了解JDBC的超时机制",
+            "image":"/java",
+            "abstract":"了解JDBC的超时机制"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/java_stury.html",
+            "title":"java工程师必须了解的知识",
+            "image":"/java",
+            "abstract":"java工程师必须了解的知识"
+        }
+        objectArray.push(obejct);
+    
+        var obejct = {
+            "url":"/java_lock.html",
+            "title":"java-synchronized锁相关内存",
+            "image":"/java",
+            "abstract":"当多个线程同时请求某个对象监视器时，对象监视器会设置几种状态用来区分请求的线程："
+        }
+        objectArray.push(obejct);
+    
+     console.log("data："+JSON.stringify(objectArray));
+
+
+    var len = 4;
+    var nowStart = 0;
+    var size = objectArray.length;
+
+    var fun = {
+
+    initHtml:function(start,end){
+    console.log("start:"+start+",end:"+end);
+    var html = "";
+    for(var i =start;i<end;i++){
+        html += '<li class="list-group-item title">'+
+                      '<span class="pinned-repo-item-content">'+
+                            '<span class="d-block">'+
+                                '<a href="'+objectArray[i]["url"]+'" class="text-bold">'+
+                                    '<span class="repo js-repo" title="apollo">'+objectArray[i]["title"]+'</span>'+
+                                '</a>'+
+                            '</span>'+
+                            '<div style="float:left;border:1px; width:100%;height: auto">'+
+                                '<div style="float:left;border:1px ; width:30%; ">'+
+                                    '<img style="height: 180px;width:180px" class="qr_code_pc_img" src="./images'+objectArray[i]["image"]+'.jpg">'+
+                                '</div>'+
+                                '<div style="float:left;border:1px  ;width:60%; ">'+
+                                    '<p class="pinned-repo-desc text-gray text-small d-block mt-2 mb-3">'+objectArray[i]["abstract"]+'</p>'+
+                                '</div>'+
+                            '</div>'+
+                      '</span>'+
+                    '</li>';
+     }
+      $("#list_ul").html("").html(html);
+      nowStart = start;
+      fun.initPages();
+    },
+    preHtml:function(nowStart){
+        console.log("nowStart"+nowStart);
+        if(nowStart == 0){
+            return;
+        }else{
+            fun.initHtml(nowStart-len,nowStart);
+            fun.initPages();
+        }
+    },
+     nextHtml:function(nowStart){
+        console.log("nowStart"+nowStart)
+        if(nowStart+len >= size){
+            return;
+        }else{
+            var endsize = nowStart+len*2 > size ? size : nowStart+len*2
+            fun.initHtml(nowStart+len,endsize);
+            fun.initPages();
+        }
+    },
+
+    initPages: function(){
+       var pagehtml = '<ul class="pagination" style="padding-bottom: 20px;"><li><a onclick="fun.preHtml('+nowStart+')">&laquo;</a></li>';
+     var pages = Math.ceil(objectArray.length/len)
+     for(var i =1;i<pages+1;i++){
+        var start = (i-1)*len;
+        var end = (i-1)*len+len;
+        pagehtml+='<li><a onclick="fun.initHtml('+start+','+end+')">'+i+'</a></li>';
+     }
+     pagehtml +='<li><a onclick="fun.nextHtml('+nowStart+')">&raquo;</a></li></ul>';
+     $("#page_ul").html(pagehtml);
+    }
+}
+     console.log("长度为："+JSON.stringify(objectArray));
+     var html = "";
+
+     fun.initHtml(0,len);
+     fun.initPages();
 </script>
 </body>
 </html>

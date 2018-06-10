@@ -112,43 +112,111 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Blog</h3>
                 </div>
-                <ul class="list-group" style="padding: 10px !important;">
-                    {% for post in postlist %}
-                    <li class="list-group-item title">
-                      <span class="pinned-repo-item-content">
-                            <span class="d-block">
-                                <a href="{{ post.url }}"class="text-bold">
-                                    <span class="repo js-repo" title="apollo">{{ post.title }}</span>
-                                </a>
-                            </span>
-                            <div style="float:left;border:1px; width:100%;height: auto">
-                                <div style="float:left;border:1px ; width:30%; ">
-                                    <img style="height: 180px;width:180px" class="qr_code_pc_img" src="./images{{ post.image }}.jpg">
-                                </div>
-                                <div style="float:left;border:1px  ;width:60%; ">
-                                    <p class="pinned-repo-desc text-gray text-small d-block mt-2 mb-3">{{ post.abstract }}</p>
-                                </div>
-                            </div>
-                            <b>标签：Java </b>
-                            </span>
-                        </li>
-                    {% endfor %}
+                <ul class="list-group" style="padding: 10px !important;" id="list_ul">
+
                 </ul>
             </div>
+            <div>
+                <div id="page_ul" style="align-content: center;    width: fit-content;    margin: auto;">
+                </div>
+            </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2" align="center">
+
         </div>
     </div>
 </div>
-<script src="/js/bootstrap.min.js"></script>
+<script src="./js/bootstrap.min.js"></script>
 <!-- Global Site Tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-106796420-1"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments)};
   gtag('js', new Date());
-  
     gtag('config', 'UA-106796420-1');
+
+    var objectArray =new Array();;
+    {% for post in postlist %}
+        var obejct = {
+            "url":"{{ post.url }}",
+            "title":"{{ post.title }}",
+            "image":"{{ post.image }}",
+            "abstract":"{{ post.abstract }}"
+        }
+        objectArray.push(obejct);
+    {% endfor %}
+     console.log("data："+JSON.stringify(objectArray));
+
+
+    var len = 4;
+    var nowStart = 0;
+    var size = objectArray.length;
+
+    var fun = {
+
+    initHtml:function(start,end){
+    console.log("start:"+start+",end:"+end);
+    var html = "";
+    for(var i =start;i<end;i++){
+        html += '<li class="list-group-item title">'+
+                      '<span class="pinned-repo-item-content">'+
+                            '<span class="d-block">'+
+                                '<a href="'+objectArray[i]["url"]+'" class="text-bold">'+
+                                    '<span class="repo js-repo" title="apollo">'+objectArray[i]["title"]+'</span>'+
+                                '</a>'+
+                            '</span>'+
+                            '<div style="float:left;border:1px; width:100%;height: auto">'+
+                                '<div style="float:left;border:1px ; width:30%; ">'+
+                                    '<img style="height: 180px;width:180px" class="qr_code_pc_img" src="./images'+objectArray[i]["image"]+'.jpg">'+
+                                '</div>'+
+                                '<div style="float:left;border:1px  ;width:60%; ">'+
+                                    '<p class="pinned-repo-desc text-gray text-small d-block mt-2 mb-3">'+objectArray[i]["abstract"]+'</p>'+
+                                '</div>'+
+                            '</div>'+
+                      '</span>'+
+                    '</li>';
+     }
+      $("#list_ul").html("").html(html);
+      nowStart = start;
+      fun.initPages();
+    },
+    preHtml:function(nowStart){
+        console.log("nowStart"+nowStart);
+        if(nowStart == 0){
+            return;
+        }else{
+            fun.initHtml(nowStart-len,nowStart);
+            fun.initPages();
+        }
+    },
+     nextHtml:function(nowStart){
+        console.log("nowStart"+nowStart)
+        if(nowStart+len >= size){
+            return;
+        }else{
+            var endsize = nowStart+len*2 > size ? size : nowStart+len*2
+            fun.initHtml(nowStart+len,endsize);
+            fun.initPages();
+        }
+    },
+
+    initPages: function(){
+       var pagehtml = '<ul class="pagination" style="padding-bottom: 20px;"><li><a onclick="fun.preHtml('+nowStart+')">&laquo;</a></li>';
+     var pages = Math.ceil(objectArray.length/len)
+     for(var i =1;i<pages+1;i++){
+        var start = (i-1)*len;
+        var end = (i-1)*len+len;
+        pagehtml+='<li><a onclick="fun.initHtml('+start+','+end+')">'+i+'</a></li>';
+     }
+     pagehtml +='<li><a onclick="fun.nextHtml('+nowStart+')">&raquo;</a></li></ul>';
+     $("#page_ul").html(pagehtml);
+    }
+}
+     console.log("长度为："+JSON.stringify(objectArray));
+     var html = "";
+
+     fun.initHtml(0,len);
+     fun.initPages();
 </script>
 </body>
 </html>
