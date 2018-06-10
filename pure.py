@@ -132,7 +132,7 @@ def develop():
     """部署到github"""
     copy_all_static()
     cover_all_post()
-    push_to_github()
+    #push_to_github()
 
 
 root_dir = dirname(__file__)
