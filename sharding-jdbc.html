@@ -2,17 +2,25 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=yes"/>
-    <link href="/css/main.css" rel="stylesheet" type="text/css">
-    <link href="/css/codehighlight.css" rel="stylesheet" type="text/css">
+    <link href="./css/main.css" rel="stylesheet" type="text/css">
+    <link href="./css/manni.css" rel="stylesheet" type="text/css">
     <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
-    <link rel="shortcut icon" href="/images/zz.jpg">
+    <link rel="shortcut icon" href="./images/zz.jpg">
     <title></title>
 </head>
 <body>
+<div class="not_in_mm">
+    <div id="js_pc_qr_code" class="qr_code_pc_outer">
+        <div class="qr_code_pc_inner">
+            <div class="qr_code_pc_2">
+                <img class="qr_code_pc_img" src="./images/myclass.jpg">
+                <p>微信扫一扫<br>关注该公众号</p>
+            </div>
+        </div>
+    </div>
+</div>
   <div class="content">
   <h1>my-sharding-jdbc</h1>
-
-<h2>my-sharding-jdbc简介</h2>
 
 <p>ShardingJDBC001简单的例子，配置信息的初始化,以及源码解析</p>
 
@@ -20,283 +28,292 @@
 
 <p>ShardingJDBC</p>
 
-<pre><code>package com.zz.sharding.jdbc.test;
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.zz.sharding.jdbc.test</span><span class="o">;</span>
 
-import io.shardingjdbc.core.api.ShardingDataSourceFactory;
-import io.shardingjdbc.core.api.config.ShardingRuleConfiguration;
-import io.shardingjdbc.core.api.config.TableRuleConfiguration;
-import io.shardingjdbc.core.api.config.strategy.InlineShardingStrategyConfiguration;
-import org.apache.commons.dbcp.BasicDataSource;
+<span class="kn">import</span> <span class="nn">io.shardingjdbc.core.api.ShardingDataSourceFactory</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.shardingjdbc.core.api.config.ShardingRuleConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.shardingjdbc.core.api.config.TableRuleConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.shardingjdbc.core.api.config.strategy.InlineShardingStrategyConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.commons.dbcp.BasicDataSource</span><span class="o">;</span>
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
+<span class="kn">import</span> <span class="nn">javax.sql.DataSource</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.Connection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.PreparedStatement</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.ResultSet</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.SQLException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Properties</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.concurrent.ConcurrentHashMap</span><span class="o">;</span>
 
 
-/**
- * 当当分库分表组件实践
- *
- * @author zhangzuizui
- * @date 2018/1/9
- */
-public class ShardingJDBC001 {
+<span class="cm">/**</span>
+<span class="cm"> * 当当分库分表组件实践</span>
+<span class="cm"> *</span>
+<span class="cm"> * @author zhangzuizui</span>
+<span class="cm"> * @date 2018/1/9</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ShardingJDBC001</span> <span class="o">{</span>
 
-    public static void main(String[] args) throws SQLException {
-        Map&lt;String, DataSource&gt; dataSourceMap = new HashMap&lt;&gt;();
-        // 配置第一个数据源
-        dataSourceMap.put("my_shard_01",createDataSource("my_shard_01"));
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+        <span class="n">Map</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">DataSource</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">dataSourceMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;();</span>
+        <span class="c1">// 配置第一个数据源</span>
+        <span class="n">dataSourceMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;my_shard_01&quot;</span><span class="o">,</span><span class="n">createDataSource</span><span class="o">(</span><span class="s">&quot;my_shard_01&quot;</span><span class="o">));</span>
 
-        // 配置第二个数据源
-        dataSourceMap.put("my_shard_02", createDataSource("my_shard_02"));
+        <span class="c1">// 配置第二个数据源</span>
+        <span class="n">dataSourceMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;my_shard_02&quot;</span><span class="o">,</span> <span class="n">createDataSource</span><span class="o">(</span><span class="s">&quot;my_shard_02&quot;</span><span class="o">));</span>
 
-        // 配置Order表规则
-        TableRuleConfiguration orderTableRuleConfig = new TableRuleConfiguration();
-        orderTableRuleConfig.setLogicTable("my_order");
-        orderTableRuleConfig.setActualDataNodes("my_shard_0${1..2}.my_order_00${1..2}");
+        <span class="c1">// 配置Order表规则</span>
+        <span class="n">TableRuleConfiguration</span> <span class="n">orderTableRuleConfig</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TableRuleConfiguration</span><span class="o">();</span>
+        <span class="n">orderTableRuleConfig</span><span class="o">.</span><span class="na">setLogicTable</span><span class="o">(</span><span class="s">&quot;my_order&quot;</span><span class="o">);</span>
+        <span class="n">orderTableRuleConfig</span><span class="o">.</span><span class="na">setActualDataNodes</span><span class="o">(</span><span class="s">&quot;my_shard_0${1..2}.my_order_00${1..2}&quot;</span><span class="o">);</span>
 
-        // 配置分库策略
-        orderTableRuleConfig.setDatabaseShardingStrategyConfig(new InlineShardingStrategyConfiguration("order_id", "my_shard_0${1}"));
+        <span class="c1">// 配置分库策略</span>
+        <span class="n">orderTableRuleConfig</span><span class="o">.</span><span class="na">setDatabaseShardingStrategyConfig</span><span class="o">(</span><span class="k">new</span> <span class="n">InlineShardingStrategyConfiguration</span><span class="o">(</span><span class="s">&quot;order_id&quot;</span><span class="o">,</span> <span class="s">&quot;my_shard_0${1}&quot;</span><span class="o">));</span>
 
-        // 配置分表策略
-        orderTableRuleConfig.setTableShardingStrategyConfig(new InlineShardingStrategyConfiguration("order_id", "my_order_00${1}"));
+        <span class="c1">// 配置分表策略</span>
+        <span class="n">orderTableRuleConfig</span><span class="o">.</span><span class="na">setTableShardingStrategyConfig</span><span class="o">(</span><span class="k">new</span> <span class="n">InlineShardingStrategyConfiguration</span><span class="o">(</span><span class="s">&quot;order_id&quot;</span><span class="o">,</span> <span class="s">&quot;my_order_00${1}&quot;</span><span class="o">));</span>
 
-        // 配置分片规则
-        ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
-        shardingRuleConfig.getTableRuleConfigs().add(orderTableRuleConfig);
+        <span class="c1">// 配置分片规则</span>
+        <span class="n">ShardingRuleConfiguration</span> <span class="n">shardingRuleConfig</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ShardingRuleConfiguration</span><span class="o">();</span>
+        <span class="n">shardingRuleConfig</span><span class="o">.</span><span class="na">getTableRuleConfigs</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">orderTableRuleConfig</span><span class="o">);</span>
 
-        // 省略配置order_item表规则...
+        <span class="c1">// 省略配置order_item表规则...</span>
 
-        // 获取数据源对象
-        DataSource dataSource = ShardingDataSourceFactory.createDataSource(dataSourceMap, shardingRuleConfig, new ConcurrentHashMap(), new Properties());
+        <span class="c1">// 获取数据源对象</span>
+        <span class="n">DataSource</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="n">ShardingDataSourceFactory</span><span class="o">.</span><span class="na">createDataSource</span><span class="o">(</span><span class="n">dataSourceMap</span><span class="o">,</span> <span class="n">shardingRuleConfig</span><span class="o">,</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">(),</span> <span class="k">new</span> <span class="n">Properties</span><span class="o">());</span>
 
-        String sql = "SELECT * FROM my_order WHERE order_id = ?";
-        //2.获取连接
-        Connection conn = dataSource.getConnection();
-        /**
-         * PrepareStatement接口是Statement接口的子接口，他继承了Statement接口的所有功能。它主要是拿来解决我们使用Stateme
-         * ParperStatement接口的机制是在数据库支持预编译的情况下预先将SQL语句编译，当多次执行这条SQL语句时，可以直接执行编译好的SQL语句，
-         * sql预处理
-         */
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, "001");
-        //4.SQL执行和结果归并
-        ResultSet rs = pstmt.executeQuery();
-        //5.获取结果
-        while(rs.next()) {
-            System.out.println("id="+rs.getInt(1)+",order_id="+rs.getString(2));
-        }
-    }
+        <span class="n">String</span> <span class="n">sql</span> <span class="o">=</span> <span class="s">&quot;SELECT * FROM my_order WHERE order_id = ?&quot;</span><span class="o">;</span>
+        <span class="c1">//2.获取连接</span>
+        <span class="n">Connection</span> <span class="n">conn</span> <span class="o">=</span> <span class="n">dataSource</span><span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
+        <span class="cm">/**</span>
+<span class="cm">         * PrepareStatement接口是Statement接口的子接口，他继承了Statement接口的所有功能。它主要是拿来解决我们使用Stateme</span>
+<span class="cm">         * ParperStatement接口的机制是在数据库支持预编译的情况下预先将SQL语句编译，当多次执行这条SQL语句时，可以直接执行编译好的SQL语句，</span>
+<span class="cm">         * sql预处理</span>
+<span class="cm">         */</span>
+        <span class="n">PreparedStatement</span> <span class="n">pstmt</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="na">prepareStatement</span><span class="o">(</span><span class="n">sql</span><span class="o">);</span>
+        <span class="n">pstmt</span><span class="o">.</span><span class="na">setString</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;001&quot;</span><span class="o">);</span>
+        <span class="c1">//4.SQL执行和结果归并</span>
+        <span class="n">ResultSet</span> <span class="n">rs</span> <span class="o">=</span> <span class="n">pstmt</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">();</span>
+        <span class="c1">//5.获取结果</span>
+        <span class="k">while</span><span class="o">(</span><span class="n">rs</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;id=&quot;</span><span class="o">+</span><span class="n">rs</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="mi">1</span><span class="o">)+</span><span class="s">&quot;,order_id=&quot;</span><span class="o">+</span><span class="n">rs</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">2</span><span class="o">));</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    /**
-     * 创建数据源
-     * @param dataSourceName
-     * @return
-     */
-    private static DataSource createDataSource(String dataSourceName) {
-        BasicDataSource result = new BasicDataSource();
-        result.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
-        result.setUrl(String.format("jdbc:mysql://localhost:3306/%s", dataSourceName));
-        result.setUsername("root");
-        result.setPassword("123456");
-        return result;
-    }
-}
-</code></pre>
+    <span class="cm">/**</span>
+<span class="cm">     * 创建数据源</span>
+<span class="cm">     * @param dataSourceName</span>
+<span class="cm">     * @return</span>
+<span class="cm">     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">DataSource</span> <span class="nf">createDataSource</span><span class="o">(</span><span class="n">String</span> <span class="n">dataSourceName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">BasicDataSource</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BasicDataSource</span><span class="o">();</span>
+        <span class="n">result</span><span class="o">.</span><span class="na">setDriverClassName</span><span class="o">(</span><span class="n">com</span><span class="o">.</span><span class="na">mysql</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">Driver</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+        <span class="n">result</span><span class="o">.</span><span class="na">setUrl</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;jdbc:mysql://localhost:3306/%s&quot;</span><span class="o">,</span> <span class="n">dataSourceName</span><span class="o">));</span>
+        <span class="n">result</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="s">&quot;root&quot;</span><span class="o">);</span>
+        <span class="n">result</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="s">&quot;123456&quot;</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <h2>一、构建ShardingDataSource数据源：初始化配置信息</h2>
 
-<pre><code>DataSource dataSource = ShardingDataSourceFactory.createDataSource()
-</code></pre>
+<div class="highlight"><pre><span></span><span class="n">DataSource</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="n">ShardingDataSourceFactory</span><span class="o">.</span><span class="na">createDataSource</span><span class="o">()</span>
+</pre></div>
+
 
 <h3>详细</h3>
 
-<pre><code>1.public static DataSource createDataSource(final Map&lt;String, DataSource&gt; dataSourceMap, final ShardingRuleConfiguration shardingRuleConfig,
-                                              final Map&lt;String, Object&gt; configMap, final Properties props) throws SQLException {
-        return new ShardingDataSource(shardingRuleConfig.build(dataSourceMap), configMap, props);
-    }
-其中shardingRuleConfig.build(dataSourceMap)构建分库和分表的规则配置
+<div class="highlight"><pre><span></span><span class="mf">1.</span><span class="kd">public</span> <span class="kd">static</span> <span class="n">DataSource</span> <span class="nf">createDataSource</span><span class="o">(</span><span class="kd">final</span> <span class="n">Map</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">DataSource</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">dataSourceMap</span><span class="o">,</span> <span class="kd">final</span> <span class="n">ShardingRuleConfiguration</span> <span class="n">shardingRuleConfig</span><span class="o">,</span>
+                                              <span class="kd">final</span> <span class="n">Map</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">configMap</span><span class="o">,</span> <span class="kd">final</span> <span class="n">Properties</span> <span class="n">props</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">ShardingDataSource</span><span class="o">(</span><span class="n">shardingRuleConfig</span><span class="o">.</span><span class="na">build</span><span class="o">(</span><span class="n">dataSourceMap</span><span class="o">),</span> <span class="n">configMap</span><span class="o">,</span> <span class="n">props</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="n">其中shardingRuleConfig</span><span class="o">.</span><span class="na">build</span><span class="o">(</span><span class="n">dataSourceMap</span><span class="o">)</span><span class="n">构建分库和分表的规则配置</span>
 
-2.public ShardingDataSource(final ShardingRule shardingRule, final Map&lt;String, Object&gt; configMap, final Properties props) throws SQLException {
-        super(shardingRule.getDataSourceMap().values());
-        if (!configMap.isEmpty()) {
-            ConfigMapContext.getInstance().getShardingConfig().putAll(configMap);
-        }
-        shardingProperties = new ShardingProperties(null == props ? new Properties() : props);
-        int executorSize = shardingProperties.getValue(ShardingPropertiesConstant.EXECUTOR_SIZE);
-        executorEngine = new ExecutorEngine(executorSize);
-        boolean showSQL = shardingProperties.getValue(ShardingPropertiesConstant.SQL_SHOW);
-        shardingContext = new ShardingContext(shardingRule, getDatabaseType(), executorEngine, showSQL);
-    }
-3.初始化ShardingContext
-</code></pre>
+<span class="mf">2.</span><span class="kd">public</span> <span class="nf">ShardingDataSource</span><span class="o">(</span><span class="kd">final</span> <span class="n">ShardingRule</span> <span class="n">shardingRule</span><span class="o">,</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">configMap</span><span class="o">,</span> <span class="kd">final</span> <span class="n">Properties</span> <span class="n">props</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">shardingRule</span><span class="o">.</span><span class="na">getDataSourceMap</span><span class="o">().</span><span class="na">values</span><span class="o">());</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">configMap</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">ConfigMapContext</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">getShardingConfig</span><span class="o">().</span><span class="na">putAll</span><span class="o">(</span><span class="n">configMap</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">shardingProperties</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ShardingProperties</span><span class="o">(</span><span class="kc">null</span> <span class="o">==</span> <span class="n">props</span> <span class="o">?</span> <span class="k">new</span> <span class="n">Properties</span><span class="o">()</span> <span class="o">:</span> <span class="n">props</span><span class="o">);</span>
+        <span class="kt">int</span> <span class="n">executorSize</span> <span class="o">=</span> <span class="n">shardingProperties</span><span class="o">.</span><span class="na">getValue</span><span class="o">(</span><span class="n">ShardingPropertiesConstant</span><span class="o">.</span><span class="na">EXECUTOR_SIZE</span><span class="o">);</span>
+        <span class="n">executorEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ExecutorEngine</span><span class="o">(</span><span class="n">executorSize</span><span class="o">);</span>
+        <span class="kt">boolean</span> <span class="n">showSQL</span> <span class="o">=</span> <span class="n">shardingProperties</span><span class="o">.</span><span class="na">getValue</span><span class="o">(</span><span class="n">ShardingPropertiesConstant</span><span class="o">.</span><span class="na">SQL_SHOW</span><span class="o">);</span>
+        <span class="n">shardingContext</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ShardingContext</span><span class="o">(</span><span class="n">shardingRule</span><span class="o">,</span> <span class="n">getDatabaseType</span><span class="o">(),</span> <span class="n">executorEngine</span><span class="o">,</span> <span class="n">showSQL</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="mf">3.</span><span class="n">初始化ShardingContext</span>
+</pre></div>
+
 
 <p>二、获取数据库连接</p>
 
-<pre><code>Connection conn = dataSource.getConnection();
-new ShardingConnection(shardingContext);
-</code></pre>
+<div class="highlight"><pre><span></span><span class="n">Connection</span> <span class="n">conn</span> <span class="o">=</span> <span class="n">dataSource</span><span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
+<span class="k">new</span> <span class="n">ShardingConnection</span><span class="o">(</span><span class="n">shardingContext</span><span class="o">);</span>
+</pre></div>
+
 
 <p>三、sql预处理</p>
 
-<pre><code>PreparedStatement pstmt = conn.prepareStatement(sql);
+<div class="highlight"><pre><span></span><span class="n">PreparedStatement</span> <span class="n">pstmt</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="na">prepareStatement</span><span class="o">(</span><span class="n">sql</span><span class="o">);</span>
 
-1.初始化sql预处理器：ShardingPreparedStatement
-public ShardingPreparedStatement(final ShardingConnection connection, final String sql, final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability) {
-        this.connection = connection;
-        this.resultSetType = resultSetType;
-        this.resultSetConcurrency = resultSetConcurrency;
-        this.resultSetHoldability = resultSetHoldability;
-        routingEngine = new PreparedStatementRoutingEngine(sql, connection.getShardingContext());
-    }
-2.构建路由引擎：PreparedStatementRoutingEngine
-routingEngine = new PreparedStatementRoutingEngine(sql, connection.getShardingContext());
-public static SQLRouter createSQLRouter(final ShardingContext shardingContext) {
-        return HintManagerHolder.isDatabaseShardingOnly() ? new DatabaseHintSQLRouter(shardingContext) : new ParsingSQLRouter(shardingContext);
-    }
-3.根据isDatabaseShardingOnly判断构造那个sqlRouter
- 提示sqlRouter:DatabaseHintSQLRouter
- 解释sqlRouter:ParsingSQLRouter
-该步骤构造了sql执行所需的路由引擎和
-</code></pre>
+<span class="mf">1.</span><span class="n">初始化sql预处理器</span><span class="err">：</span><span class="n">ShardingPreparedStatement</span>
+<span class="kd">public</span> <span class="nf">ShardingPreparedStatement</span><span class="o">(</span><span class="kd">final</span> <span class="n">ShardingConnection</span> <span class="n">connection</span><span class="o">,</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">sql</span><span class="o">,</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">resultSetType</span><span class="o">,</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">resultSetConcurrency</span><span class="o">,</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">resultSetHoldability</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">connection</span> <span class="o">=</span> <span class="n">connection</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">resultSetType</span> <span class="o">=</span> <span class="n">resultSetType</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">resultSetConcurrency</span> <span class="o">=</span> <span class="n">resultSetConcurrency</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">resultSetHoldability</span> <span class="o">=</span> <span class="n">resultSetHoldability</span><span class="o">;</span>
+        <span class="n">routingEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PreparedStatementRoutingEngine</span><span class="o">(</span><span class="n">sql</span><span class="o">,</span> <span class="n">connection</span><span class="o">.</span><span class="na">getShardingContext</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="mf">2.</span><span class="n">构建路由引擎</span><span class="err">：</span><span class="n">PreparedStatementRoutingEngine</span>
+<span class="n">routingEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PreparedStatementRoutingEngine</span><span class="o">(</span><span class="n">sql</span><span class="o">,</span> <span class="n">connection</span><span class="o">.</span><span class="na">getShardingContext</span><span class="o">());</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="n">SQLRouter</span> <span class="nf">createSQLRouter</span><span class="o">(</span><span class="kd">final</span> <span class="n">ShardingContext</span> <span class="n">shardingContext</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">HintManagerHolder</span><span class="o">.</span><span class="na">isDatabaseShardingOnly</span><span class="o">()</span> <span class="o">?</span> <span class="k">new</span> <span class="n">DatabaseHintSQLRouter</span><span class="o">(</span><span class="n">shardingContext</span><span class="o">)</span> <span class="o">:</span> <span class="k">new</span> <span class="n">ParsingSQLRouter</span><span class="o">(</span><span class="n">shardingContext</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="mf">3.</span><span class="n">根据isDatabaseShardingOnly判断构造那个sqlRouter</span>
+ <span class="n">提示sqlRouter</span><span class="o">:</span><span class="n">DatabaseHintSQLRouter</span>
+ <span class="n">解释sqlRouter</span><span class="o">:</span><span class="n">ParsingSQLRouter</span>
+<span class="n">该步骤构造了sql执行所需的路由引擎和</span>
+</pre></div>
+
 
 <h2>一、路由库和表</h2>
 
-<pre><code>@Override
-public ResultSet executeQuery() throws SQLException {
-        ResultSet result;
-        try {
-            Collection&lt;PreparedStatementUnit&gt; preparedStatementUnits = route();
-            List&lt;ResultSet&gt; resultSets = new PreparedStatementExecutor(
-                    getConnection().getShardingContext().getExecutorEngine(), routeResult.getSqlStatement().getType(), preparedStatementUnits, getParameters()).executeQuery();
-            result = new ShardingResultSet(resultSets, new MergeEngine(resultSets, (SelectStatement) routeResult.getSqlStatement()).merge(), this);
-        } finally {
-            clearBatch();
-        }
-        currentResultSet = result;
-        return result;
-    }
-1.构建路由preparedStatementUnits
-   routeResult = routingEngine.route(getParameters());
+<div class="highlight"><pre><span></span><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="n">ResultSet</span> <span class="nf">executeQuery</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+        <span class="n">ResultSet</span> <span class="n">result</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">Collection</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">PreparedStatementUnit</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">preparedStatementUnits</span> <span class="o">=</span> <span class="n">route</span><span class="o">();</span>
+            <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ResultSet</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">resultSets</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PreparedStatementExecutor</span><span class="o">(</span>
+                    <span class="n">getConnection</span><span class="o">().</span><span class="na">getShardingContext</span><span class="o">().</span><span class="na">getExecutorEngine</span><span class="o">(),</span> <span class="n">routeResult</span><span class="o">.</span><span class="na">getSqlStatement</span><span class="o">().</span><span class="na">getType</span><span class="o">(),</span> <span class="n">preparedStatementUnits</span><span class="o">,</span> <span class="n">getParameters</span><span class="o">()).</span><span class="na">executeQuery</span><span class="o">();</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ShardingResultSet</span><span class="o">(</span><span class="n">resultSets</span><span class="o">,</span> <span class="k">new</span> <span class="n">MergeEngine</span><span class="o">(</span><span class="n">resultSets</span><span class="o">,</span> <span class="o">(</span><span class="n">SelectStatement</span><span class="o">)</span> <span class="n">routeResult</span><span class="o">.</span><span class="na">getSqlStatement</span><span class="o">()).</span><span class="na">merge</span><span class="o">(),</span> <span class="k">this</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">clearBatch</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="n">currentResultSet</span> <span class="o">=</span> <span class="n">result</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="mf">1.</span><span class="n">构建路由preparedStatementUnits</span>
+   <span class="n">routeResult</span> <span class="o">=</span> <span class="n">routingEngine</span><span class="o">.</span><span class="na">route</span><span class="o">(</span><span class="n">getParameters</span><span class="o">());</span>
 
-    @Override
-    public SQLRouteResult route(final String logicSQL, final List&lt;Object&gt; parameters, final SQLStatement sqlStatement) {
-        SQLRouteResult result = new SQLRouteResult(sqlStatement);
-        if (sqlStatement instanceof InsertStatement &amp;&amp; null != ((InsertStatement) sqlStatement).getGeneratedKey()) {
-            processGeneratedKey(parameters, (InsertStatement) sqlStatement, result);
-        }
-        RoutingResult routingResult = route(parameters, sqlStatement);
-        SQLRewriteEngine rewriteEngine = new SQLRewriteEngine(shardingRule, logicSQL, databaseType, sqlStatement);
-        boolean isSingleRouting = routingResult.isSingleRouting();
-        if (sqlStatement instanceof SelectStatement &amp;&amp; null != ((SelectStatement) sqlStatement).getLimit()) {
-            processLimit(parameters, (SelectStatement) sqlStatement, isSingleRouting);
-        }
-        SQLBuilder sqlBuilder = rewriteEngine.rewrite(!isSingleRouting);
-        if (routingResult instanceof CartesianRoutingResult) {
-            for (CartesianDataSource cartesianDataSource : ((CartesianRoutingResult) routingResult).getRoutingDataSources()) {
-                for (CartesianTableReference cartesianTableReference : cartesianDataSource.getRoutingTableReferences()) {
-                    result.getExecutionUnits().add(new SQLExecutionUnit(cartesianDataSource.getDataSource(), rewriteEngine.generateSQL(cartesianTableReference, sqlBuilder)));
-                }
-            }
-        } else {
-            for (TableUnit each : routingResult.getTableUnits().getTableUnits()) {
-                result.getExecutionUnits().add(new SQLExecutionUnit(each.getDataSourceName(), rewriteEngine.generateSQL(each, sqlBuilder)));
-            }
-        }
-        if (showSQL) {
-            SQLLogger.logSQL(logicSQL, sqlStatement, result.getExecutionUnits(), parameters);
-        }
-        return result;
-    }
-3.
-//sql声明
-sqlStatement = sqlRouter.parse(logicSQL, parameters.size());
-//构造SQL解析引擎
-SQLParsingEngine parsingEngine = new SQLParsingEngine(databaseType, logicSQL, shardingRule);
-//SQL解析引擎调用Lexer进行sql词法解析
-SQLStatement result = parsingEngine.parse();
-public SQLStatement parse() {
-        //构建LexerEngine,构造Lexer(String input, Dictionary dictionary)
-        LexerEngine lexerEngine = LexerEngineFactory.newInstance(dbType, sql);
-        //解析
-        lexerEngine.nextToken();
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">SQLRouteResult</span> <span class="nf">route</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">logicSQL</span><span class="o">,</span> <span class="kd">final</span> <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Object</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">parameters</span><span class="o">,</span> <span class="kd">final</span> <span class="n">SQLStatement</span> <span class="n">sqlStatement</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SQLRouteResult</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SQLRouteResult</span><span class="o">(</span><span class="n">sqlStatement</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">sqlStatement</span> <span class="k">instanceof</span> <span class="n">InsertStatement</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="kc">null</span> <span class="o">!=</span> <span class="o">((</span><span class="n">InsertStatement</span><span class="o">)</span> <span class="n">sqlStatement</span><span class="o">).</span><span class="na">getGeneratedKey</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">processGeneratedKey</span><span class="o">(</span><span class="n">parameters</span><span class="o">,</span> <span class="o">(</span><span class="n">InsertStatement</span><span class="o">)</span> <span class="n">sqlStatement</span><span class="o">,</span> <span class="n">result</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">RoutingResult</span> <span class="n">routingResult</span> <span class="o">=</span> <span class="n">route</span><span class="o">(</span><span class="n">parameters</span><span class="o">,</span> <span class="n">sqlStatement</span><span class="o">);</span>
+        <span class="n">SQLRewriteEngine</span> <span class="n">rewriteEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SQLRewriteEngine</span><span class="o">(</span><span class="n">shardingRule</span><span class="o">,</span> <span class="n">logicSQL</span><span class="o">,</span> <span class="n">databaseType</span><span class="o">,</span> <span class="n">sqlStatement</span><span class="o">);</span>
+        <span class="kt">boolean</span> <span class="n">isSingleRouting</span> <span class="o">=</span> <span class="n">routingResult</span><span class="o">.</span><span class="na">isSingleRouting</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">sqlStatement</span> <span class="k">instanceof</span> <span class="n">SelectStatement</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="kc">null</span> <span class="o">!=</span> <span class="o">((</span><span class="n">SelectStatement</span><span class="o">)</span> <span class="n">sqlStatement</span><span class="o">).</span><span class="na">getLimit</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">processLimit</span><span class="o">(</span><span class="n">parameters</span><span class="o">,</span> <span class="o">(</span><span class="n">SelectStatement</span><span class="o">)</span> <span class="n">sqlStatement</span><span class="o">,</span> <span class="n">isSingleRouting</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">SQLBuilder</span> <span class="n">sqlBuilder</span> <span class="o">=</span> <span class="n">rewriteEngine</span><span class="o">.</span><span class="na">rewrite</span><span class="o">(!</span><span class="n">isSingleRouting</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">routingResult</span> <span class="k">instanceof</span> <span class="n">CartesianRoutingResult</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="n">CartesianDataSource</span> <span class="n">cartesianDataSource</span> <span class="o">:</span> <span class="o">((</span><span class="n">CartesianRoutingResult</span><span class="o">)</span> <span class="n">routingResult</span><span class="o">).</span><span class="na">getRoutingDataSources</span><span class="o">())</span> <span class="o">{</span>
+                <span class="k">for</span> <span class="o">(</span><span class="n">CartesianTableReference</span> <span class="n">cartesianTableReference</span> <span class="o">:</span> <span class="n">cartesianDataSource</span><span class="o">.</span><span class="na">getRoutingTableReferences</span><span class="o">())</span> <span class="o">{</span>
+                    <span class="n">result</span><span class="o">.</span><span class="na">getExecutionUnits</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SQLExecutionUnit</span><span class="o">(</span><span class="n">cartesianDataSource</span><span class="o">.</span><span class="na">getDataSource</span><span class="o">(),</span> <span class="n">rewriteEngine</span><span class="o">.</span><span class="na">generateSQL</span><span class="o">(</span><span class="n">cartesianTableReference</span><span class="o">,</span> <span class="n">sqlBuilder</span><span class="o">)));</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="n">TableUnit</span> <span class="n">each</span> <span class="o">:</span> <span class="n">routingResult</span><span class="o">.</span><span class="na">getTableUnits</span><span class="o">().</span><span class="na">getTableUnits</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">result</span><span class="o">.</span><span class="na">getExecutionUnits</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SQLExecutionUnit</span><span class="o">(</span><span class="n">each</span><span class="o">.</span><span class="na">getDataSourceName</span><span class="o">(),</span> <span class="n">rewriteEngine</span><span class="o">.</span><span class="na">generateSQL</span><span class="o">(</span><span class="n">each</span><span class="o">,</span> <span class="n">sqlBuilder</span><span class="o">)));</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">showSQL</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">SQLLogger</span><span class="o">.</span><span class="na">logSQL</span><span class="o">(</span><span class="n">logicSQL</span><span class="o">,</span> <span class="n">sqlStatement</span><span class="o">,</span> <span class="n">result</span><span class="o">.</span><span class="na">getExecutionUnits</span><span class="o">(),</span> <span class="n">parameters</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="mf">3.</span>
+<span class="c1">//sql声明</span>
+<span class="n">sqlStatement</span> <span class="o">=</span> <span class="n">sqlRouter</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">logicSQL</span><span class="o">,</span> <span class="n">parameters</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+<span class="c1">//构造SQL解析引擎</span>
+<span class="n">SQLParsingEngine</span> <span class="n">parsingEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SQLParsingEngine</span><span class="o">(</span><span class="n">databaseType</span><span class="o">,</span> <span class="n">logicSQL</span><span class="o">,</span> <span class="n">shardingRule</span><span class="o">);</span>
+<span class="c1">//SQL解析引擎调用Lexer进行sql词法解析</span>
+<span class="n">SQLStatement</span> <span class="n">result</span> <span class="o">=</span> <span class="n">parsingEngine</span><span class="o">.</span><span class="na">parse</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">SQLStatement</span> <span class="nf">parse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">//构建LexerEngine,构造Lexer(String input, Dictionary dictionary)</span>
+        <span class="n">LexerEngine</span> <span class="n">lexerEngine</span> <span class="o">=</span> <span class="n">LexerEngineFactory</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">dbType</span><span class="o">,</span> <span class="n">sql</span><span class="o">);</span>
+        <span class="c1">//解析</span>
+        <span class="n">lexerEngine</span><span class="o">.</span><span class="na">nextToken</span><span class="o">();</span>
 
-        return SQLParserFactory.newInstance(dbType, lexerEngine.getCurrentToken().getType(), shardingRule, lexerEngine).parse();
-    }
+        <span class="k">return</span> <span class="n">SQLParserFactory</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">dbType</span><span class="o">,</span> <span class="n">lexerEngine</span><span class="o">.</span><span class="na">getCurrentToken</span><span class="o">().</span><span class="na">getType</span><span class="o">(),</span> <span class="n">shardingRule</span><span class="o">,</span> <span class="n">lexerEngine</span><span class="o">).</span><span class="na">parse</span><span class="o">();</span>
+    <span class="o">}</span>
 
-创建数据库：SQLParserFactory.newInstance
-根据数据库类型创建 ：例如：MySQLSelectParser
-然后调用
-    @Override
-    public final SelectStatement parse() {
-        SelectStatement result = parseInternal();
-        if (result.containsSubQuery()) {
-            result = result.mergeSubQueryStatement();
-        }
-        // TODO move to rewrite
-        appendDerivedColumns(result);
-        appendDerivedOrderBy(result);
-        return result;
-    }
-    //具体解析sql
-    @Override
-    protected void parseInternal(final SelectStatement selectStatement) {
-        parseDistinct();
-        parseSelectOption();
-        parseSelectList(selectStatement, getItems());
-        parseFrom(selectStatement);
-        parseWhere(getShardingRule(), selectStatement, getItems());
-        parseGroupBy(selectStatement);
-        parseHaving();
-        parseOrderBy(selectStatement);
-        parseLimit(selectStatement);
-        parseSelectRest();
-    }
-这里大部分调用lexerEngine中的方法进行sql词法解析：
-</code></pre>
+<span class="n">创建数据库</span><span class="err">：</span><span class="n">SQLParserFactory</span><span class="o">.</span><span class="na">newInstance</span>
+<span class="n">根据数据库类型创建</span> <span class="err">：</span><span class="n">例如</span><span class="err">：</span><span class="n">MySQLSelectParser</span>
+<span class="n">然后调用</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">SelectStatement</span> <span class="nf">parse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">SelectStatement</span> <span class="n">result</span> <span class="o">=</span> <span class="n">parseInternal</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">containsSubQuery</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="na">mergeSubQueryStatement</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="c1">// TODO move to rewrite</span>
+        <span class="n">appendDerivedColumns</span><span class="o">(</span><span class="n">result</span><span class="o">);</span>
+        <span class="n">appendDerivedOrderBy</span><span class="o">(</span><span class="n">result</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">//具体解析sql</span>
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">parseInternal</span><span class="o">(</span><span class="kd">final</span> <span class="n">SelectStatement</span> <span class="n">selectStatement</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">parseDistinct</span><span class="o">();</span>
+        <span class="n">parseSelectOption</span><span class="o">();</span>
+        <span class="n">parseSelectList</span><span class="o">(</span><span class="n">selectStatement</span><span class="o">,</span> <span class="n">getItems</span><span class="o">());</span>
+        <span class="n">parseFrom</span><span class="o">(</span><span class="n">selectStatement</span><span class="o">);</span>
+        <span class="n">parseWhere</span><span class="o">(</span><span class="n">getShardingRule</span><span class="o">(),</span> <span class="n">selectStatement</span><span class="o">,</span> <span class="n">getItems</span><span class="o">());</span>
+        <span class="n">parseGroupBy</span><span class="o">(</span><span class="n">selectStatement</span><span class="o">);</span>
+        <span class="n">parseHaving</span><span class="o">();</span>
+        <span class="n">parseOrderBy</span><span class="o">(</span><span class="n">selectStatement</span><span class="o">);</span>
+        <span class="n">parseLimit</span><span class="o">(</span><span class="n">selectStatement</span><span class="o">);</span>
+        <span class="n">parseSelectRest</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="n">这里大部分调用lexerEngine中的方法进行sql词法解析</span><span class="err">：</span>
+</pre></div>
+
 
 <h2>路由之后执行准备sql预处理</h2>
 
-<pre><code>for (SQLExecutionUnit each : routeResult.getExecutionUnits()) {
-   SQLType sqlType = routeResult.getSqlStatement().getType();
-   Collection&lt;PreparedStatement&gt; preparedStatements;
-   //事务类型的sql，单独处理
-   if (SQLType.DDL == sqlType) {
-       preparedStatements = generatePreparedStatementForDDL(each);
-   } else {
-       preparedStatements = Collections.singletonList(generatePreparedStatement(each));
-   }
-   routedStatements.addAll(preparedStatements);
-   for (PreparedStatement preparedStatement : preparedStatements) {
-       replaySetParameter(preparedStatement);
-       result.add(new PreparedStatementUnit(each, preparedStatement));
-   }
-}
-</code></pre>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="o">(</span><span class="n">SQLExecutionUnit</span> <span class="n">each</span> <span class="o">:</span> <span class="n">routeResult</span><span class="o">.</span><span class="na">getExecutionUnits</span><span class="o">())</span> <span class="o">{</span>
+   <span class="n">SQLType</span> <span class="n">sqlType</span> <span class="o">=</span> <span class="n">routeResult</span><span class="o">.</span><span class="na">getSqlStatement</span><span class="o">().</span><span class="na">getType</span><span class="o">();</span>
+   <span class="n">Collection</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">PreparedStatement</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">preparedStatements</span><span class="o">;</span>
+   <span class="c1">//事务类型的sql，单独处理</span>
+   <span class="k">if</span> <span class="o">(</span><span class="n">SQLType</span><span class="o">.</span><span class="na">DDL</span> <span class="o">==</span> <span class="n">sqlType</span><span class="o">)</span> <span class="o">{</span>
+       <span class="n">preparedStatements</span> <span class="o">=</span> <span class="n">generatePreparedStatementForDDL</span><span class="o">(</span><span class="n">each</span><span class="o">);</span>
+   <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+       <span class="n">preparedStatements</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">singletonList</span><span class="o">(</span><span class="n">generatePreparedStatement</span><span class="o">(</span><span class="n">each</span><span class="o">));</span>
+   <span class="o">}</span>
+   <span class="n">routedStatements</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">preparedStatements</span><span class="o">);</span>
+   <span class="k">for</span> <span class="o">(</span><span class="n">PreparedStatement</span> <span class="n">preparedStatement</span> <span class="o">:</span> <span class="n">preparedStatements</span><span class="o">)</span> <span class="o">{</span>
+       <span class="n">replaySetParameter</span><span class="o">(</span><span class="n">preparedStatement</span><span class="o">);</span>
+       <span class="n">result</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">PreparedStatementUnit</span><span class="o">(</span><span class="n">each</span><span class="o">,</span> <span class="n">preparedStatement</span><span class="o">));</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <h2>二、创建sql处理器并执行sql</h2>
 
-<pre><code> List&lt;ResultSet&gt; resultSets = new PreparedStatementExecutor(
-                    getConnection().getShardingContext().getExecutorEngine(), routeResult.getSqlStatement().getType(), preparedStatementUnits, getParameters())
-                    .executeQuery();
-</code></pre>
+<div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ResultSet</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">resultSets</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PreparedStatementExecutor</span><span class="o">(</span>
+                    <span class="n">getConnection</span><span class="o">().</span><span class="na">getShardingContext</span><span class="o">().</span><span class="na">getExecutorEngine</span><span class="o">(),</span> <span class="n">routeResult</span><span class="o">.</span><span class="na">getSqlStatement</span><span class="o">().</span><span class="na">getType</span><span class="o">(),</span> <span class="n">preparedStatementUnits</span><span class="o">,</span> <span class="n">getParameters</span><span class="o">())</span>
+                    <span class="o">.</span><span class="na">executeQuery</span><span class="o">();</span>
+</pre></div>
+
 
 <h2>二、结果归并处理</h2>
 
-<pre><code>result = new ShardingResultSet(resultSets, new MergeEngine(resultSets, (SelectStatement) routeResult.getSqlStatement()).merge(), this);
-回调，jdbc底层执行sql，并处理结果集
-return executorEngine.executePreparedStatement(sqlType, preparedStatementUnits, parameters, new ExecuteCallback&lt;ResultSet&gt;() {
-            @Override
-            public ResultSet execute(final BaseStatementUnit baseStatementUnit) throws Exception {
-                return ((PreparedStatement) baseStatementUnit.getStatement()).executeQuery();
-            }
-        });
-</code></pre>
+<div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ShardingResultSet</span><span class="o">(</span><span class="n">resultSets</span><span class="o">,</span> <span class="k">new</span> <span class="n">MergeEngine</span><span class="o">(</span><span class="n">resultSets</span><span class="o">,</span> <span class="o">(</span><span class="n">SelectStatement</span><span class="o">)</span> <span class="n">routeResult</span><span class="o">.</span><span class="na">getSqlStatement</span><span class="o">()).</span><span class="na">merge</span><span class="o">(),</span> <span class="k">this</span><span class="o">);</span>
+<span class="n">回调</span><span class="err">，</span><span class="n">jdbc底层执行sql</span><span class="err">，</span><span class="n">并处理结果集</span>
+<span class="k">return</span> <span class="n">executorEngine</span><span class="o">.</span><span class="na">executePreparedStatement</span><span class="o">(</span><span class="n">sqlType</span><span class="o">,</span> <span class="n">preparedStatementUnits</span><span class="o">,</span> <span class="n">parameters</span><span class="o">,</span> <span class="k">new</span> <span class="n">ExecuteCallback</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ResultSet</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="n">ResultSet</span> <span class="nf">execute</span><span class="o">(</span><span class="kd">final</span> <span class="n">BaseStatementUnit</span> <span class="n">baseStatementUnit</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="o">((</span><span class="n">PreparedStatement</span><span class="o">)</span> <span class="n">baseStatementUnit</span><span class="o">.</span><span class="na">getStatement</span><span class="o">()).</span><span class="na">executeQuery</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+</pre></div>
+
 
   </div>
 </body>

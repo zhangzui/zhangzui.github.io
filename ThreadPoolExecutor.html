@@ -2,17 +2,25 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=yes"/>
-    <link href="/css/main.css" rel="stylesheet" type="text/css">
-    <link href="/css/codehighlight.css" rel="stylesheet" type="text/css">
+    <link href="./css/main.css" rel="stylesheet" type="text/css">
+    <link href="./css/manni.css" rel="stylesheet" type="text/css">
     <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
-    <link rel="shortcut icon" href="/images/zz.jpg">
+    <link rel="shortcut icon" href="./images/zz.jpg">
     <title></title>
 </head>
 <body>
+<div class="not_in_mm">
+    <div id="js_pc_qr_code" class="qr_code_pc_outer">
+        <div class="qr_code_pc_inner">
+            <div class="qr_code_pc_2">
+                <img class="qr_code_pc_img" src="./images/myclass.jpg">
+                <p>微信扫一扫<br>关注该公众号</p>
+            </div>
+        </div>
+    </div>
+</div>
   <div class="content">
   <h1>深入理解Java线程池：</h1>
-
-<h2>线程池介绍</h2>
 
 <p>Java中的线程池是用ThreadPoolExecutor类来实现的. 本文就结合JDK 1.8对该类的源码来分析一下这个类内部对于线程的创建, 管理以及后台任务的调度等方面的执行原理。</p>
 
@@ -38,114 +46,117 @@
 
 <p><strong>Executor接口</strong></p>
 
-<pre><code>public interface Executor {
-    /**
-     * 在将来的某个时候执行传入的命令，执行命令可以在实现类里通过新创建的线程、线程池、当前线程来完成。
-     */
-    void execute(Runnable command);
-}
-</code></pre>
+<div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Executor</span> <span class="o">{</span>
+    <span class="cm">/**</span>
+<span class="cm">     * 在将来的某个时候执行传入的命令，执行命令可以在实现类里通过新创建的线程、线程池、当前线程来完成。</span>
+<span class="cm">     */</span>
+    <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">command</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p><strong>ExecutorService接口</strong></p>
 
-<pre><code>public interface ExecutorService extends Executor {
+<div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">ExecutorService</span> <span class="kd">extends</span> <span class="n">Executor</span> <span class="o">{</span>
 
-    /**
-     * 启动先前提交的任务被执行的有序关闭，但不接受新的任务。 如果已经关闭，则调用没有其他影响。
-     */
-    void shutdown();
+    <span class="cm">/**</span>
+<span class="cm">     * 启动先前提交的任务被执行的有序关闭，但不接受新的任务。 如果已经关闭，则调用没有其他影响。</span>
+<span class="cm">     */</span>
+    <span class="kt">void</span> <span class="nf">shutdown</span><span class="o">();</span>
 
-    /**
-     * 尝试停止所有正在执行的任务，停止等待任务的处理，并返回正在等待执行的任务的列表。
-     * 该方法不能等待之前提交的任务执行完，如果需要等待执行，可以使用{@link #awaitTermination awaitTermination}
-     * 从这个方法返回后，这些任务从任务队列中排出（移除）。 除了竭尽全力地停止处理主动执行任务之外，没有任何保证。 
-     */
-    List&lt;Runnable&gt; shutdownNow();
+    <span class="cm">/**</span>
+<span class="cm">     * 尝试停止所有正在执行的任务，停止等待任务的处理，并返回正在等待执行的任务的列表。</span>
+<span class="cm">     * 该方法不能等待之前提交的任务执行完，如果需要等待执行，可以使用{@link #awaitTermination awaitTermination}</span>
+<span class="cm">     * 从这个方法返回后，这些任务从任务队列中排出（移除）。 除了竭尽全力地停止处理主动执行任务之外，没有任何保证。 </span>
+<span class="cm">     */</span>
+    <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">shutdownNow</span><span class="o">();</span>
 
-    /**
-     * 线程池有没有被关闭，关闭返回true，否则false
-     */
-    boolean isShutdown();
+    <span class="cm">/**</span>
+<span class="cm">     * 线程池有没有被关闭，关闭返回true，否则false</span>
+<span class="cm">     */</span>
+    <span class="kt">boolean</span> <span class="nf">isShutdown</span><span class="o">();</span>
 
-    /**
-     * 如果所有任务在关闭后都完成了。返回true
-     * 提示：如果没有在调用该方法前调用shutdown或者shutdownNow方法，此方法永远不会返回true
-     */
-    boolean isTerminated();
+    <span class="cm">/**</span>
+<span class="cm">     * 如果所有任务在关闭后都完成了。返回true</span>
+<span class="cm">     * 提示：如果没有在调用该方法前调用shutdown或者shutdownNow方法，此方法永远不会返回true</span>
+<span class="cm">     */</span>
+    <span class="kt">boolean</span> <span class="nf">isTerminated</span><span class="o">();</span>
 
-    /**
-     * 在指定时间内阻塞等待任务全部完成，完成了返回true，否则false
-     */
-    boolean awaitTermination(long timeout, TimeUnit unit)
-        throws InterruptedException;
+    <span class="cm">/**</span>
+<span class="cm">     * 在指定时间内阻塞等待任务全部完成，完成了返回true，否则false</span>
+<span class="cm">     */</span>
+    <span class="kt">boolean</span> <span class="nf">awaitTermination</span><span class="o">(</span><span class="kt">long</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">TimeUnit</span> <span class="n">unit</span><span class="o">)</span>
+        <span class="kd">throws</span> <span class="n">InterruptedException</span><span class="o">;</span>
 
-    /**
-     * 提交一个有返回值的任务
-     */
-    &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task);
+    <span class="cm">/**</span>
+<span class="cm">     * 提交一个有返回值的任务</span>
+<span class="cm">     */</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">Future</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">submit</span><span class="o">(</span><span class="n">Callable</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">task</span><span class="o">);</span>
 
-    /**
-     * 提交一个任务来执行，返回一个有返回值的结果，返回值为传入的result
-     */
-    &lt;T&gt; Future&lt;T&gt; submit(Runnable task, T result);
+    <span class="cm">/**</span>
+<span class="cm">     * 提交一个任务来执行，返回一个有返回值的结果，返回值为传入的result</span>
+<span class="cm">     */</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">Future</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">submit</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">task</span><span class="o">,</span> <span class="n">T</span> <span class="n">result</span><span class="o">);</span>
 
-    /**
-     * 提交一个任务来执行，返回一个有返回值的结果，返回值为null
-     */
-    Future&lt;?&gt; submit(Runnable task);
+    <span class="cm">/**</span>
+<span class="cm">     * 提交一个任务来执行，返回一个有返回值的结果，返回值为null</span>
+<span class="cm">     */</span>
+    <span class="n">Future</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">submit</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">task</span><span class="o">);</span>
 
-    /**
-     * 执行一批有返回值的任务
-     * 返回的结果调用{@link Future#isDone}都是true
-     */
-    &lt;T&gt; List&lt;Future&lt;T&gt;&gt; invokeAll(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks)
-        throws InterruptedException;
-    /**
-     * 执行给定的任务，当全部完成或者超时返回一个有状态和结果的Future集合。
-     * 返回的结果调用{@link Future#isDone}都是true
-     * 返回时，尚未完成的任务将被取消。
-     * 如果在进行此操作时修改了给定的集合，则此方法的结果是不确定的。
-     */
-    &lt;T&gt; List&lt;Future&lt;T&gt;&gt; invokeAll(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks,
-                                  long timeout, TimeUnit unit)
-        throws InterruptedException;
+    <span class="cm">/**</span>
+<span class="cm">     * 执行一批有返回值的任务</span>
+<span class="cm">     * 返回的结果调用{@link Future#isDone}都是true</span>
+<span class="cm">     */</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Future</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">invokeAll</span><span class="o">(</span><span class="n">Collection</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?</span> <span class="kd">extends</span> <span class="n">Callable</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">tasks</span><span class="o">)</span>
+        <span class="kd">throws</span> <span class="n">InterruptedException</span><span class="o">;</span>
+    <span class="cm">/**</span>
+<span class="cm">     * 执行给定的任务，当全部完成或者超时返回一个有状态和结果的Future集合。</span>
+<span class="cm">     * 返回的结果调用{@link Future#isDone}都是true</span>
+<span class="cm">     * 返回时，尚未完成的任务将被取消。</span>
+<span class="cm">     * 如果在进行此操作时修改了给定的集合，则此方法的结果是不确定的。</span>
+<span class="cm">     */</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Future</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">invokeAll</span><span class="o">(</span><span class="n">Collection</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?</span> <span class="kd">extends</span> <span class="n">Callable</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">tasks</span><span class="o">,</span>
+                                  <span class="kt">long</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">TimeUnit</span> <span class="n">unit</span><span class="o">)</span>
+        <span class="kd">throws</span> <span class="n">InterruptedException</span><span class="o">;</span>
 
-    /**
-     * 执行给定的任务，返回一个成功完成任务的结果（即，没有抛出异常），
-     * 如果有的话。 在正常或异常返回时，尚未完成的任务将被取消。 
-     * 如果在进行此操作时修改了给定的集合，则此方法的结果是不确定的。
-     */
-    &lt;T&gt; T invokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks)
-        throws InterruptedException, ExecutionException;
+    <span class="cm">/**</span>
+<span class="cm">     * 执行给定的任务，返回一个成功完成任务的结果（即，没有抛出异常），</span>
+<span class="cm">     * 如果有的话。 在正常或异常返回时，尚未完成的任务将被取消。 </span>
+<span class="cm">     * 如果在进行此操作时修改了给定的集合，则此方法的结果是不确定的。</span>
+<span class="cm">     */</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">T</span> <span class="nf">invokeAny</span><span class="o">(</span><span class="n">Collection</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?</span> <span class="kd">extends</span> <span class="n">Callable</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">tasks</span><span class="o">)</span>
+        <span class="kd">throws</span> <span class="n">InterruptedException</span><span class="o">,</span> <span class="n">ExecutionException</span><span class="o">;</span>
 
-    /**
-     * 执行给定的任务，返回一个成功完成任务的结果（即，没有抛出异常），
-     * 如果有的话。 在正常或异常返回时，尚未完成的任务将被取消。 
-     * 如果在进行此操作时修改了给定的集合，则此方法的结果是不确定的。
-     * 超时没有成功结果抛出TimeoutException
-     */
-    &lt;T&gt; T invokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks,
-                    long timeout, TimeUnit unit)
-        throws InterruptedException, ExecutionException, TimeoutException;
-}
-</code></pre>
+    <span class="cm">/**</span>
+<span class="cm">     * 执行给定的任务，返回一个成功完成任务的结果（即，没有抛出异常），</span>
+<span class="cm">     * 如果有的话。 在正常或异常返回时，尚未完成的任务将被取消。 </span>
+<span class="cm">     * 如果在进行此操作时修改了给定的集合，则此方法的结果是不确定的。</span>
+<span class="cm">     * 超时没有成功结果抛出TimeoutException</span>
+<span class="cm">     */</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">T</span> <span class="nf">invokeAny</span><span class="o">(</span><span class="n">Collection</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?</span> <span class="kd">extends</span> <span class="n">Callable</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">tasks</span><span class="o">,</span>
+                    <span class="kt">long</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">TimeUnit</span> <span class="n">unit</span><span class="o">)</span>
+        <span class="kd">throws</span> <span class="n">InterruptedException</span><span class="o">,</span> <span class="n">ExecutionException</span><span class="o">,</span> <span class="n">TimeoutException</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p><strong>AbstractExecutorService接口</strong></p>
 
-<pre><code>protected &lt;T&gt; RunnableFuture&lt;T&gt; newTaskFor(Runnable runnable, T value) {
-    return new FutureTask&lt;T&gt;(runnable, value);
-}
+<div class="highlight"><pre><span></span><span class="kd">protected</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">RunnableFuture</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">newTaskFor</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">runnable</span><span class="o">,</span> <span class="n">T</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">FutureTask</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;(</span><span class="n">runnable</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+<span class="o">}</span>
 
-protected &lt;T&gt; RunnableFuture&lt;T&gt; newTaskFor(Callable&lt;T&gt; callable) {
-    return new FutureTask&lt;T&gt;(callable);
-}
+<span class="kd">protected</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">RunnableFuture</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">newTaskFor</span><span class="o">(</span><span class="n">Callable</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">callable</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">FutureTask</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;(</span><span class="n">callable</span><span class="o">);</span>
+<span class="o">}</span>
 
-private &lt;T&gt; T doInvokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks,
-                          boolean timed, long nanos)
-    throws InterruptedException, ExecutionException, TimeoutException {
-    // ...
-}
-</code></pre>
+<span class="kd">private</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">T</span> <span class="nf">doInvokeAny</span><span class="o">(</span><span class="n">Collection</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?</span> <span class="kd">extends</span> <span class="n">Callable</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">tasks</span><span class="o">,</span>
+                          <span class="kt">boolean</span> <span class="n">timed</span><span class="o">,</span> <span class="kt">long</span> <span class="n">nanos</span><span class="o">)</span>
+    <span class="kd">throws</span> <span class="n">InterruptedException</span><span class="o">,</span> <span class="n">ExecutionException</span><span class="o">,</span> <span class="n">TimeoutException</span> <span class="o">{</span>
+    <span class="c1">// ...</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <h2>3、ThreadPoolExecutor分析</h2>
 
@@ -153,86 +164,89 @@ private &lt;T&gt; T doInvokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; ta
 
 <h3>3.1、核心变量与方法（状态转换）</h3>
 
-<pre><code>// 状态|工作数的一个32bit的值
-private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
-private static final int COUNT_BITS = Integer.SIZE - 3;
-// 0001-1111-1111-1111-1111-1111-1111-1111
-private static final int CAPACITY   = (1 &lt;&lt; COUNT_BITS) - 1;
+<div class="highlight"><pre><span></span><span class="c1">// 状态|工作数的一个32bit的值</span>
+<span class="kd">private</span> <span class="kd">final</span> <span class="n">AtomicInteger</span> <span class="n">ctl</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">(</span><span class="n">ctlOf</span><span class="o">(</span><span class="n">RUNNING</span><span class="o">,</span> <span class="mi">0</span><span class="o">));</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">COUNT_BITS</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">SIZE</span> <span class="o">-</span> <span class="mi">3</span><span class="o">;</span>
+<span class="c1">// 0001-1111-1111-1111-1111-1111-1111-1111</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">CAPACITY</span>   <span class="o">=</span> <span class="o">(</span><span class="mi">1</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">)</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span>
 
-// 1110-0000-0000-0000-0000-0000-0000-0000
-private static final int RUNNING    = -1 &lt;&lt; COUNT_BITS;
-// 0000-0000-0000-0000-0000-0000-0000-0000
-private static final int SHUTDOWN   =  0 &lt;&lt; COUNT_BITS;
-// 0010-0000-0000-0000-0000-0000-0000-0000
-private static final int STOP       =  1 &lt;&lt; COUNT_BITS;
-// 0100-0000-0000-0000-0000-0000-0000-0000
-private static final int TIDYING    =  2 &lt;&lt; COUNT_BITS;
-// 0110-0000-0000-0000-0000-0000-0000-0000
-private static final int TERMINATED =  3 &lt;&lt; COUNT_BITS;
+<span class="c1">// 1110-0000-0000-0000-0000-0000-0000-0000</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">RUNNING</span>    <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
+<span class="c1">// 0000-0000-0000-0000-0000-0000-0000-0000</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">SHUTDOWN</span>   <span class="o">=</span>  <span class="mi">0</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
+<span class="c1">// 0010-0000-0000-0000-0000-0000-0000-0000</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">STOP</span>       <span class="o">=</span>  <span class="mi">1</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
+<span class="c1">// 0100-0000-0000-0000-0000-0000-0000-0000</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">TIDYING</span>    <span class="o">=</span>  <span class="mi">2</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
+<span class="c1">// 0110-0000-0000-0000-0000-0000-0000-0000</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">TERMINATED</span> <span class="o">=</span>  <span class="mi">3</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
 
-// ~CAPACITY就是前3位状态位，和c进行&amp;就能得到当前的状态
-private static int runStateOf(int c)     { return c &amp; ~CAPACITY; }
-// 和c进行&amp;就能得到当前的工作数
-private static int workerCountOf(int c)  { return c &amp; CAPACITY; }
-// rs就是状态值，wc就是工作数，这两个进行或操作，就能得到ctl的值（32bit的值）
-private static int ctlOf(int rs, int wc) { return rs | wc; }
-</code></pre>
+<span class="c1">// ~CAPACITY就是前3位状态位，和c进行&amp;amp;就能得到当前的状态</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">runStateOf</span><span class="o">(</span><span class="kt">int</span> <span class="n">c</span><span class="o">)</span>     <span class="o">{</span> <span class="k">return</span> <span class="n">c</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">~</span><span class="n">CAPACITY</span><span class="o">;</span> <span class="o">}</span>
+<span class="c1">// 和c进行&amp;amp;就能得到当前的工作数</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">workerCountOf</span><span class="o">(</span><span class="kt">int</span> <span class="n">c</span><span class="o">)</span>  <span class="o">{</span> <span class="k">return</span> <span class="n">c</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">CAPACITY</span><span class="o">;</span> <span class="o">}</span>
+<span class="c1">// rs就是状态值，wc就是工作数，这两个进行或操作，就能得到ctl的值（32bit的值）</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">ctlOf</span><span class="o">(</span><span class="kt">int</span> <span class="n">rs</span><span class="o">,</span> <span class="kt">int</span> <span class="n">wc</span><span class="o">)</span> <span class="o">{</span> <span class="k">return</span> <span class="n">rs</span> <span class="o">|</span> <span class="n">wc</span><span class="o">;</span> <span class="o">}</span>
+</pre></div>
+
 
 <p>可能很多人看到上面的写法都蒙圈了。我其实基础也不太好，所以我看到这里的时候索性写了个工具类去测试他们的输出结果，如下：</p>
 
-<pre><code>public class ExecutorTest {
-    private final static int COUNT_BITS = Integer.SIZE - 3;
-    private final static int RUNNING    = -1 &lt;&lt; COUNT_BITS;
-    private final static int SHUTDOWN   =  0 &lt;&lt; COUNT_BITS;
-    private final static int STOP       =  1 &lt;&lt; COUNT_BITS;
-    private final static int TIDYING    =  2 &lt;&lt; COUNT_BITS;
-    private final static int TERMINATED =  3 &lt;&lt; COUNT_BITS;
-    private final static int CAPACITY   = (1 &lt;&lt; COUNT_BITS) - 1;
+<div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExecutorTest</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">COUNT_BITS</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">SIZE</span> <span class="o">-</span> <span class="mi">3</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">RUNNING</span>    <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">SHUTDOWN</span>   <span class="o">=</span>  <span class="mi">0</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">STOP</span>       <span class="o">=</span>  <span class="mi">1</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">TIDYING</span>    <span class="o">=</span>  <span class="mi">2</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">TERMINATED</span> <span class="o">=</span>  <span class="mi">3</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">CAPACITY</span>   <span class="o">=</span> <span class="o">(</span><span class="mi">1</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">COUNT_BITS</span><span class="o">)</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span>
 
-    public static void main(String[] args) {
-        System.out.println("状态位===");
-        System.out.println(getFormatStr(RUNNING));
-        System.out.println(getFormatStr(SHUTDOWN));
-        System.out.println(getFormatStr(STOP));
-        System.out.println(getFormatStr(TIDYING));
-        System.out.println(getFormatStr(TERMINATED));
-        System.out.println(getFormatStr(CAPACITY));
-    }
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;状态位===&quot;</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">getFormatStr</span><span class="o">(</span><span class="n">RUNNING</span><span class="o">));</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">getFormatStr</span><span class="o">(</span><span class="n">SHUTDOWN</span><span class="o">));</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">getFormatStr</span><span class="o">(</span><span class="n">STOP</span><span class="o">));</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">getFormatStr</span><span class="o">(</span><span class="n">TIDYING</span><span class="o">));</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">getFormatStr</span><span class="o">(</span><span class="n">TERMINATED</span><span class="o">));</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">getFormatStr</span><span class="o">(</span><span class="n">CAPACITY</span><span class="o">));</span>
+    <span class="o">}</span>
 
-    private static String getFormatStr(int n) {
-        String integerMaxValueStr = Integer.toBinaryString(n);
-        int a = 32;
-        StringBuilder sb = new StringBuilder();
-        int l = integerMaxValueStr.length();
-        int i = 0;
-        for (; a &gt; 0; --a) {
-            if (--l &gt;= 0) {
-                sb.append(integerMaxValueStr.charAt(l));
-            } else {
-                sb.append("0");
-            }
-            if (++i % 4 == 0) {
-                if (a &gt; 1) {
-                    sb.append("-");
-                }
-                i = 0;
-            }
-        }
-        return sb.reverse().toString();
-    }
-}
-</code></pre>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getFormatStr</span><span class="o">(</span><span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">integerMaxValueStr</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">toBinaryString</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
+        <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">32</span><span class="o">;</span>
+        <span class="n">StringBuilder</span> <span class="n">sb</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">();</span>
+        <span class="kt">int</span> <span class="n">l</span> <span class="o">=</span> <span class="n">integerMaxValueStr</span><span class="o">.</span><span class="na">length</span><span class="o">();</span>
+        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(;</span> <span class="n">a</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="mi">0</span><span class="o">;</span> <span class="o">--</span><span class="n">a</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(--</span><span class="n">l</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">integerMaxValueStr</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">l</span><span class="o">));</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;0&quot;</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(++</span><span class="n">i</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">a</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;-&quot;</span><span class="o">);</span>
+                <span class="o">}</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">sb</span><span class="o">.</span><span class="na">reverse</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>输出结果为：</p>
 
-<pre><code>状态位===
-1110-0000-0000-0000-0000-0000-0000-0000
-0000-0000-0000-0000-0000-0000-0000-0000
-0010-0000-0000-0000-0000-0000-0000-0000
-0100-0000-0000-0000-0000-0000-0000-0000
-0110-0000-0000-0000-0000-0000-0000-0000
-0001-1111-1111-1111-1111-1111-1111-1111
-</code></pre>
+<div class="highlight"><pre><span></span><span class="n">状态位</span><span class="o">===</span>
+<span class="mi">1110</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span>
+<span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span>
+<span class="mo">0010</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span>
+<span class="mo">0100</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span>
+<span class="mo">0110</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span><span class="o">-</span><span class="mo">0000</span>
+<span class="mo">0001</span><span class="o">-</span><span class="mi">1111</span><span class="o">-</span><span class="mi">1111</span><span class="o">-</span><span class="mi">1111</span><span class="o">-</span><span class="mi">1111</span><span class="o">-</span><span class="mi">1111</span><span class="o">-</span><span class="mi">1111</span><span class="o">-</span><span class="mi">1111</span>
+</pre></div>
+
 
 <p>通过上面的注释以及测试用例可以发现，源码的作者巧妙的运用一个值代表了2种意思（前3bit位是状态，后29bit是工作数），下面我们来看看线程池最重要的5种状态：
 * 1、RUNNING：能接受新提交的任务，并且也能处理阻塞队列中的任务；
@@ -246,37 +260,38 @@ private static int ctlOf(int rs, int wc) { return rs | wc; }
 
 <h3>3.2、构造方法</h3>
 
-<pre><code>/**
- * @param corePoolSize 保留在线程池中的线程数，即使它们处于空闲状态，除非设置了{@code allowCoreThreadTimeOut}
- * @param maximumPoolSize 线程池中允许的最大线程数
- * @param keepAliveTime 当线程数大于corePoolSize时，这是多余空闲线程在终止之前等待新任务的最大时间。
- * @param unit {@code keepAliveTime}参数的时间单位
- * @param workQueue 在执行任务之前用于保存任务的队列。 这个队列将只保存{@code execute}方法提交的{@code Runnable}任务。
- * @param threadFactory 用来执行的时候创建线程的线程工厂
- * @param handler 在执行被阻塞时使用的处理程序，因为达到了线程边界和队列容量
- */
-public ThreadPoolExecutor(int corePoolSize,
-                          int maximumPoolSize,
-                          long keepAliveTime,
-                          TimeUnit unit,
-                          BlockingQueue&lt;Runnable&gt; workQueue,
-                          ThreadFactory threadFactory,
-                          RejectedExecutionHandler handler) {
-    if (corePoolSize &lt; 0 ||
-        maximumPoolSize &lt;= 0 ||
-        maximumPoolSize &lt; corePoolSize ||
-        keepAliveTime &lt; 0)
-        throw new IllegalArgumentException();
-    if (workQueue == null || threadFactory == null || handler == null)
-        throw new NullPointerException();
-    this.corePoolSize = corePoolSize;
-    this.maximumPoolSize = maximumPoolSize;
-    this.workQueue = workQueue;
-    this.keepAliveTime = unit.toNanos(keepAliveTime);
-    this.threadFactory = threadFactory;
-    this.handler = handler;
-}
-</code></pre>
+<div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * @param corePoolSize 保留在线程池中的线程数，即使它们处于空闲状态，除非设置了{@code allowCoreThreadTimeOut}</span>
+<span class="cm"> * @param maximumPoolSize 线程池中允许的最大线程数</span>
+<span class="cm"> * @param keepAliveTime 当线程数大于corePoolSize时，这是多余空闲线程在终止之前等待新任务的最大时间。</span>
+<span class="cm"> * @param unit {@code keepAliveTime}参数的时间单位</span>
+<span class="cm"> * @param workQueue 在执行任务之前用于保存任务的队列。 这个队列将只保存{@code execute}方法提交的{@code Runnable}任务。</span>
+<span class="cm"> * @param threadFactory 用来执行的时候创建线程的线程工厂</span>
+<span class="cm"> * @param handler 在执行被阻塞时使用的处理程序，因为达到了线程边界和队列容量</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="nf">ThreadPoolExecutor</span><span class="o">(</span><span class="kt">int</span> <span class="n">corePoolSize</span><span class="o">,</span>
+                          <span class="kt">int</span> <span class="n">maximumPoolSize</span><span class="o">,</span>
+                          <span class="kt">long</span> <span class="n">keepAliveTime</span><span class="o">,</span>
+                          <span class="n">TimeUnit</span> <span class="n">unit</span><span class="o">,</span>
+                          <span class="n">BlockingQueue</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">workQueue</span><span class="o">,</span>
+                          <span class="n">ThreadFactory</span> <span class="n">threadFactory</span><span class="o">,</span>
+                          <span class="n">RejectedExecutionHandler</span> <span class="n">handler</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">corePoolSize</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="mi">0</span> <span class="o">||</span>
+        <span class="n">maximumPoolSize</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;=</span> <span class="mi">0</span> <span class="o">||</span>
+        <span class="n">maximumPoolSize</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">corePoolSize</span> <span class="o">||</span>
+        <span class="n">keepAliveTime</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="mi">0</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">workQueue</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">threadFactory</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">handler</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">();</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">corePoolSize</span> <span class="o">=</span> <span class="n">corePoolSize</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">maximumPoolSize</span> <span class="o">=</span> <span class="n">maximumPoolSize</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">workQueue</span> <span class="o">=</span> <span class="n">workQueue</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">keepAliveTime</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="na">toNanos</span><span class="o">(</span><span class="n">keepAliveTime</span><span class="o">);</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">threadFactory</span> <span class="o">=</span> <span class="n">threadFactory</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">handler</span> <span class="o">=</span> <span class="n">handler</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>对于参数handler：线程池提供了4种策略：
 * 1.AbortPolicy：直接抛出异常，这是默认策略；
@@ -290,63 +305,64 @@ public ThreadPoolExecutor(int corePoolSize,
 
 <p>线程池最核心的方法莫过于execute了，execute()方法用来提交任务，下面我们顺着这个方法看看其实现原理：</p>
 
-<pre><code>/**
- * 在未来的某个时刻执行给定的任务。这个任务用一个新线程执行，或者用一个线程池中已经存在的线程执行
- * 如果任务无法被提交执行，要么是因为这个Executor已经被shutdown关闭，要么是已经达到其容量上限，任务会被当前的RejectedExecutionHandler处理
- */
-public void execute(Runnable command) {
-    if (command == null)
-        throw new NullPointerException();
-    /*
-     * 执行分以下3步：
-     *
-     * 1. 如果运行的线程少于corePoolSize，尝试开启一个新线程去运行command，command作为这个线程的第一个任务
-     *
-     * 2. 如果线程入队成功，然后还是要进行double-check的，因为线程池在入队之后状态是可能会发生变化的
-     *
-     * 3. 如果无法将任务入队列（可能队列满了），需要新开一个线程
-     * 如果失败了，说明线程池shutdown 或者 饱和了，所以我们拒绝任务。
-     */
-    int c = ctl.get();
+<div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * 在未来的某个时刻执行给定的任务。这个任务用一个新线程执行，或者用一个线程池中已经存在的线程执行</span>
+<span class="cm"> * 如果任务无法被提交执行，要么是因为这个Executor已经被shutdown关闭，要么是已经达到其容量上限，任务会被当前的RejectedExecutionHandler处理</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">command</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">command</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">();</span>
+    <span class="cm">/*</span>
+<span class="cm">     * 执行分以下3步：</span>
+<span class="cm">     *</span>
+<span class="cm">     * 1. 如果运行的线程少于corePoolSize，尝试开启一个新线程去运行command，command作为这个线程的第一个任务</span>
+<span class="cm">     *</span>
+<span class="cm">     * 2. 如果线程入队成功，然后还是要进行double-check的，因为线程池在入队之后状态是可能会发生变化的</span>
+<span class="cm">     *</span>
+<span class="cm">     * 3. 如果无法将任务入队列（可能队列满了），需要新开一个线程</span>
+<span class="cm">     * 如果失败了，说明线程池shutdown 或者 饱和了，所以我们拒绝任务。</span>
+<span class="cm">     */</span>
+    <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
 
-    /**
-     * 1、如果当前线程数少于corePoolSize，开启一个线程执行命令
-     *（可能是由于addWorker()操作已经包含对线程池状态的判断，如此处没加，而入workQueue前加了）
-     */
-    if (workerCountOf(c) &lt; corePoolSize) {
-        if (addWorker(command, true))
-            return;
+    <span class="cm">/**</span>
+<span class="cm">     * 1、如果当前线程数少于corePoolSize，开启一个线程执行命令</span>
+<span class="cm">     *（可能是由于addWorker()操作已经包含对线程池状态的判断，如此处没加，而入workQueue前加了）</span>
+<span class="cm">     */</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">workerCountOf</span><span class="o">(</span><span class="n">c</span><span class="o">)</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">corePoolSize</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">addWorker</span><span class="o">(</span><span class="n">command</span><span class="o">,</span> <span class="kc">true</span><span class="o">))</span>
+            <span class="k">return</span><span class="o">;</span>
 
-        /**
-         * 没有成功addWorker()，再次获取c（凡是需要再次用ctl做判断时，都会再次调用ctl.get()）
-         * 失败的原因可能是：
-         * 1、线程池已经shutdown，shutdown的线程池不再接收新任务
-         * 2、workerCountOf(c) &lt; corePoolSize 判断后，由于并发，别的线程先创建了worker线程，导致workerCount&gt;=corePoolSize
-         */
-        c = ctl.get();
-    }
+        <span class="cm">/**</span>
+<span class="cm">         * 没有成功addWorker()，再次获取c（凡是需要再次用ctl做判断时，都会再次调用ctl.get()）</span>
+<span class="cm">         * 失败的原因可能是：</span>
+<span class="cm">         * 1、线程池已经shutdown，shutdown的线程池不再接收新任务</span>
+<span class="cm">         * 2、workerCountOf(c) &amp;lt; corePoolSize 判断后，由于并发，别的线程先创建了worker线程，导致workerCount&amp;gt;=corePoolSize</span>
+<span class="cm">         */</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+    <span class="o">}</span>
 
-    /**
-     * 2、如果线程池RUNNING状态，且入队列成功
-     */
-    if (isRunning(c) &amp;&amp; workQueue.offer(command)) {
-        int recheck = ctl.get();//再次校验位
+    <span class="cm">/**</span>
+<span class="cm">     * 2、如果线程池RUNNING状态，且入队列成功</span>
+<span class="cm">     */</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">isRunning</span><span class="o">(</span><span class="n">c</span><span class="o">)</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">workQueue</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="n">command</span><span class="o">))</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">recheck</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span><span class="c1">//再次校验位</span>
 
-        //如果再次校验过程中，线程池不是RUNNING状态，并且remove(command)--workQueue.remove()成功，拒绝当前command
-        if (! isRunning(recheck) &amp;&amp; remove(command))
-            reject(command);
-        else if (workerCountOf(recheck) == 0)
-            // 新建一个worker线程，没有指定firstTask，因为命令已经放入queue里了
-            addWorker(null, false);
-    }
-    /**
-     * 3、如果线程池不是running状态 或者 无法入队列
-     *   尝试开启新线程，扩容至maxPoolSize，如果addWork(command, false)失败了，拒绝当前command
-     */
-    else if (!addWorker(command, false))
-        reject(command);
-}
-</code></pre>
+        <span class="c1">//如果再次校验过程中，线程池不是RUNNING状态，并且remove(command)--workQueue.remove()成功，拒绝当前command</span>
+        <span class="k">if</span> <span class="o">(!</span> <span class="n">isRunning</span><span class="o">(</span><span class="n">recheck</span><span class="o">)</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">remove</span><span class="o">(</span><span class="n">command</span><span class="o">))</span>
+            <span class="n">reject</span><span class="o">(</span><span class="n">command</span><span class="o">);</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">workerCountOf</span><span class="o">(</span><span class="n">recheck</span><span class="o">)</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+            <span class="c1">// 新建一个worker线程，没有指定firstTask，因为命令已经放入queue里了</span>
+            <span class="n">addWorker</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="cm">/**</span>
+<span class="cm">     * 3、如果线程池不是running状态 或者 无法入队列</span>
+<span class="cm">     *   尝试开启新线程，扩容至maxPoolSize，如果addWork(command, false)失败了，拒绝当前command</span>
+<span class="cm">     */</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="o">(!</span><span class="n">addWorker</span><span class="o">(</span><span class="n">command</span><span class="o">,</span> <span class="kc">false</span><span class="o">))</span>
+        <span class="n">reject</span><span class="o">(</span><span class="n">command</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>在执行execute()方法时如果状态一直是RUNNING时，的执行过程如下：
 * 1.如果workerCount &lt; corePoolSize，则创建并启动一个线程来执行新提交的任务；
@@ -358,87 +374,88 @@ public void execute(Runnable command) {
 
 <p>addWorker方法的主要工作是在线程池中创建一个新的线程并执行，firstTask参数 用于指定新增的线程执行的第一个任务。core为true表示在新增线程时会判断当前活动线程数是否少于corePoolSize，false表示新增线程前需要判断当前活动线程数是否少于maximumPoolSize，代码如下：</p>
 
-<pre><code>/**
- * 检查是否可以针对当前的池状态和给定的界限（核心或最大值）添加新的工作者。相应地调整工人数量，并且如果可能的话，创建并开始新的工作者，运行firstTask作为其第一个任务。
- */
-private boolean addWorker(Runnable firstTask, boolean core) {
-    retry:
-    for (;;) {
-        int c = ctl.get();
-        int rs = runStateOf(c);
+<div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * 检查是否可以针对当前的池状态和给定的界限（核心或最大值）添加新的工作者。相应地调整工人数量，并且如果可能的话，创建并开始新的工作者，运行firstTask作为其第一个任务。</span>
+<span class="cm"> */</span>
+<span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">addWorker</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">firstTask</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">core</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">retry</span><span class="o">:</span>
+    <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+        <span class="kt">int</span> <span class="n">rs</span> <span class="o">=</span> <span class="n">runStateOf</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
 
-        /**
-         * 只有当下面两种情况会继续执行，其他直接返回false（添加失败）
-         * 1、rs == RUNNING
-         * 2、rs == SHUTDOWN &amp;&amp; firstTask == null &amp;&amp; !workQueue.isEmpty() （执行了shutdown方法，但是阻塞队列还有任务没有执行）
-         */
-        if (rs &gt;= SHUTDOWN &amp;&amp;
-            ! (rs == SHUTDOWN &amp;&amp;
-               firstTask == null &amp;&amp;
-               ! workQueue.isEmpty()))
-            return false;
+        <span class="cm">/**</span>
+<span class="cm">         * 只有当下面两种情况会继续执行，其他直接返回false（添加失败）</span>
+<span class="cm">         * 1、rs == RUNNING</span>
+<span class="cm">         * 2、rs == SHUTDOWN &amp;amp;&amp;amp; firstTask == null &amp;amp;&amp;amp; !workQueue.isEmpty() （执行了shutdown方法，但是阻塞队列还有任务没有执行）</span>
+<span class="cm">         */</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">rs</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="n">SHUTDOWN</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span>
+            <span class="o">!</span> <span class="o">(</span><span class="n">rs</span> <span class="o">==</span> <span class="n">SHUTDOWN</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span>
+               <span class="n">firstTask</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span>
+               <span class="o">!</span> <span class="n">workQueue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()))</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
 
-        for (;;) {
-            int wc = workerCountOf(c);
-            // 当wc超过最大限制 || 如果是核心线程，超过了核心数，否则超过了最大线程数，直接返回false
-            if (wc &gt;= CAPACITY ||
-                wc &gt;= (core ? corePoolSize : maximumPoolSize))
-                return false;
-            if (compareAndIncrementWorkerCount(c))
-                // count累加成功，直接跳出两层for循环，执行下面的逻辑
-                break retry;
+        <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">wc</span> <span class="o">=</span> <span class="n">workerCountOf</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
+            <span class="c1">// 当wc超过最大限制 || 如果是核心线程，超过了核心数，否则超过了最大线程数，直接返回false</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">wc</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="n">CAPACITY</span> <span class="o">||</span>
+                <span class="n">wc</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="o">(</span><span class="n">core</span> <span class="o">?</span> <span class="n">corePoolSize</span> <span class="o">:</span> <span class="n">maximumPoolSize</span><span class="o">))</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">compareAndIncrementWorkerCount</span><span class="o">(</span><span class="n">c</span><span class="o">))</span>
+                <span class="c1">// count累加成功，直接跳出两层for循环，执行下面的逻辑</span>
+                <span class="k">break</span> <span class="n">retry</span><span class="o">;</span>
 
-            /**
-             * 能执行到这里，都是因为多线程竞争，只有两种情况
-             * 1、workCount发生变化，compareAndIncrementWorkerCount失败，这种情况不需要重新获取ctl，继续for循环即可。
-             * 2、runState发生变化，可能执行了shutdown或者shutdownNow，这种情况重新走retry，取得最新的ctl并判断状态。
-             */
-            c = ctl.get();  // 重新读取ctl，可能状态发生了变化
-            if (runStateOf(c) != rs)
-                continue retry;
-        }
-    }
+            <span class="cm">/**</span>
+<span class="cm">             * 能执行到这里，都是因为多线程竞争，只有两种情况</span>
+<span class="cm">             * 1、workCount发生变化，compareAndIncrementWorkerCount失败，这种情况不需要重新获取ctl，继续for循环即可。</span>
+<span class="cm">             * 2、runState发生变化，可能执行了shutdown或者shutdownNow，这种情况重新走retry，取得最新的ctl并判断状态。</span>
+<span class="cm">             */</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>  <span class="c1">// 重新读取ctl，可能状态发生了变化</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">runStateOf</span><span class="o">(</span><span class="n">c</span><span class="o">)</span> <span class="o">!=</span> <span class="n">rs</span><span class="o">)</span>
+                <span class="k">continue</span> <span class="n">retry</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    boolean workerStarted = false;
-    boolean workerAdded = false;
-    Worker w = null;
-    try {
-        w = new Worker(firstTask);
-        final Thread t = w.thread;
-        if (t != null) {
-            final ReentrantLock mainLock = this.mainLock;
-            mainLock.lock();
-            try {
-                // 获取锁后重新检测runState，因为有可能shutdown了
-                int rs = runStateOf(ctl.get());
+    <span class="kt">boolean</span> <span class="n">workerStarted</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="kt">boolean</span> <span class="n">workerAdded</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="n">Worker</span> <span class="n">w</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Worker</span><span class="o">(</span><span class="n">firstTask</span><span class="o">);</span>
+        <span class="kd">final</span> <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="na">thread</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">t</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+            <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="c1">// 获取锁后重新检测runState，因为有可能shutdown了</span>
+                <span class="kt">int</span> <span class="n">rs</span> <span class="o">=</span> <span class="n">runStateOf</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
 
-                if (rs &lt; SHUTDOWN ||
-                    (rs == SHUTDOWN &amp;&amp; firstTask == null)) {
-                    if (t.isAlive())
-                        // 线程不能是活跃状态
-                        throw new IllegalThreadStateException();
-                    workers.add(w);
-                    int s = workers.size();
-                    if (s &gt; largestPoolSize)
-                        largestPoolSize = s;    //记录最大线程数
-                    workerAdded = true;
-                }
-            } finally {
-                mainLock.unlock();
-            }
-            if (workerAdded) {
-                t.start();
-                workerStarted = true;
-            }
-        }
-    } finally {
-        if (! workerStarted)
-            // 失败回退,从 wokers 移除 w, 线程数减一，尝试结束线程池(调用tryTerminate 方法)
-            addWorkerFailed(w);
-    }
-    return workerStarted;
-}
-</code></pre>
+                <span class="k">if</span> <span class="o">(</span><span class="n">rs</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">SHUTDOWN</span> <span class="o">||</span>
+                    <span class="o">(</span><span class="n">rs</span> <span class="o">==</span> <span class="n">SHUTDOWN</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">firstTask</span> <span class="o">==</span> <span class="kc">null</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="na">isAlive</span><span class="o">())</span>
+                        <span class="c1">// 线程不能是活跃状态</span>
+                        <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalThreadStateException</span><span class="o">();</span>
+                    <span class="n">workers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">w</span><span class="o">);</span>
+                    <span class="kt">int</span> <span class="n">s</span> <span class="o">=</span> <span class="n">workers</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">s</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">largestPoolSize</span><span class="o">)</span>
+                        <span class="n">largestPoolSize</span> <span class="o">=</span> <span class="n">s</span><span class="o">;</span>    <span class="c1">//记录最大线程数</span>
+                    <span class="n">workerAdded</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                <span class="o">}</span>
+            <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">workerAdded</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">t</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+                <span class="n">workerStarted</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span> <span class="n">workerStarted</span><span class="o">)</span>
+            <span class="c1">// 失败回退,从 wokers 移除 w, 线程数减一，尝试结束线程池(调用tryTerminate 方法)</span>
+            <span class="n">addWorkerFailed</span><span class="o">(</span><span class="n">w</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">workerStarted</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>注意一下这里的t.start()这个语句，启动时会调用Worker类中的run方法，Worker本身实现了Runnable接口，所以一个Worker类型的对象也是一个线程。</p>
 
@@ -446,62 +463,63 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 
 <p>线程池中的每一个线程被封装成一个Worker对象，ThreadPool维护的其实就是一组Worker对象，看一下Worker的定义：</p>
 
-<pre><code>private final class Worker extends AbstractQueuedSynchronizer implements Runnable {
-    final Thread thread;
-    Runnable firstTask;
-    volatile long completedTasks;
+<div class="highlight"><pre><span></span><span class="kd">private</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">Worker</span> <span class="kd">extends</span> <span class="n">AbstractQueuedSynchronizer</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Thread</span> <span class="n">thread</span><span class="o">;</span>
+    <span class="n">Runnable</span> <span class="n">firstTask</span><span class="o">;</span>
+    <span class="kd">volatile</span> <span class="kt">long</span> <span class="n">completedTasks</span><span class="o">;</span>
 
-    Worker(Runnable firstTask) {
-        // 还没有执行任务时，这时就不应该被中断，设置状态为-1
-        setState(-1);
-        this.firstTask = firstTask;
-        this.thread = getThreadFactory().newThread(this);
-    }
+    <span class="n">Worker</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">firstTask</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 还没有执行任务时，这时就不应该被中断，设置状态为-1</span>
+        <span class="n">setState</span><span class="o">(-</span><span class="mi">1</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">firstTask</span> <span class="o">=</span> <span class="n">firstTask</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">thread</span> <span class="o">=</span> <span class="n">getThreadFactory</span><span class="o">().</span><span class="na">newThread</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    public void run() {
-        // 调用runWorker方法执行
-        runWorker(this);
-    }
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// 调用runWorker方法执行</span>
+        <span class="n">runWorker</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    // Lock methods
-    //
-    // 0代表没有锁定状态
-    // 1代表锁定状态
+    <span class="c1">// Lock methods</span>
+    <span class="c1">//</span>
+    <span class="c1">// 0代表没有锁定状态</span>
+    <span class="c1">// 1代表锁定状态</span>
 
-    protected boolean isHeldExclusively() {
-        return getState() != 0;
-    }
+    <span class="kd">protected</span> <span class="kt">boolean</span> <span class="nf">isHeldExclusively</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">getState</span><span class="o">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    protected boolean tryAcquire(int unused) {
-        if (compareAndSetState(0, 1)) {
-            setExclusiveOwnerThread(Thread.currentThread());
-            return true;
-        }
-        return false;
-    }
+    <span class="kd">protected</span> <span class="kt">boolean</span> <span class="nf">tryAcquire</span><span class="o">(</span><span class="kt">int</span> <span class="n">unused</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">compareAndSetState</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">1</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">setExclusiveOwnerThread</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">());</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    protected boolean tryRelease(int unused) {
-        setExclusiveOwnerThread(null);
-        setState(0);
-        return true;
-    }
+    <span class="kd">protected</span> <span class="kt">boolean</span> <span class="nf">tryRelease</span><span class="o">(</span><span class="kt">int</span> <span class="n">unused</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">setExclusiveOwnerThread</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+        <span class="n">setState</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    public void lock()        { acquire(1); }
-    public boolean tryLock()  { return tryAcquire(1); }
-    public void unlock()      { release(1); }
-    public boolean isLocked() { return isHeldExclusively(); }
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">lock</span><span class="o">()</span>        <span class="o">{</span> <span class="n">acquire</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">tryLock</span><span class="o">()</span>  <span class="o">{</span> <span class="k">return</span> <span class="n">tryAcquire</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">unlock</span><span class="o">()</span>      <span class="o">{</span> <span class="n">release</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isLocked</span><span class="o">()</span> <span class="o">{</span> <span class="k">return</span> <span class="n">isHeldExclusively</span><span class="o">();</span> <span class="o">}</span>
 
-    void interruptIfStarted() {
-        Thread t;
-        if (getState() &gt;= 0 &amp;&amp; (t = thread) != null &amp;&amp; !t.isInterrupted()) {
-            try {
-                t.interrupt();
-            } catch (SecurityException ignore) {
-            }
-        }
-    }
-}
-</code></pre>
+    <span class="kt">void</span> <span class="nf">interruptIfStarted</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Thread</span> <span class="n">t</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">getState</span><span class="o">()</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="mi">0</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">(</span><span class="n">t</span> <span class="o">=</span> <span class="n">thread</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">!</span><span class="n">t</span><span class="o">.</span><span class="na">isInterrupted</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">t</span><span class="o">.</span><span class="na">interrupt</span><span class="o">();</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SecurityException</span> <span class="n">ignore</span><span class="o">)</span> <span class="o">{</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>Worker继承了AQS，使用AQS来实现独占锁的功能。为什么不使用ReentrantLock来实现呢？可以看到tryAcquire方法，它是不允许重入的，而ReentrantLock是允许重入的：
 * 1.lock方法一旦获取了独占锁，表示当前线程正在执行任务中；
@@ -516,180 +534,181 @@ private boolean addWorker(Runnable firstTask, boolean core) {
 
 <p>在Worker类中的run方法调用了runWorker方法来执行任务，runWorker方法的代码如下：</p>
 
-<pre><code>final void runWorker(Worker w) {
-    Thread wt = Thread.currentThread();
-    Runnable task = w.firstTask;
-    w.firstTask = null;
-    w.unlock(); // 允许中断
-    boolean completedAbruptly = true;
-    try {
-        // 如果task为空，则通过getTask来获取任务
-        while (task != null || (task = getTask()) != null) {
-            w.lock();   // 开始运行，不允许中断
+<div class="highlight"><pre><span></span><span class="kd">final</span> <span class="kt">void</span> <span class="nf">runWorker</span><span class="o">(</span><span class="n">Worker</span> <span class="n">w</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Thread</span> <span class="n">wt</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
+    <span class="n">Runnable</span> <span class="n">task</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="na">firstTask</span><span class="o">;</span>
+    <span class="n">w</span><span class="o">.</span><span class="na">firstTask</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">w</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span> <span class="c1">// 允许中断</span>
+    <span class="kt">boolean</span> <span class="n">completedAbruptly</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="c1">// 如果task为空，则通过getTask来获取任务</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">task</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">||</span> <span class="o">(</span><span class="n">task</span> <span class="o">=</span> <span class="n">getTask</span><span class="o">())</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">w</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>   <span class="c1">// 开始运行，不允许中断</span>
 
-            /**
-             * 确保只有在线程STOP时，才会被设置中断标示，否则清除中断标示
-             * 1、如果线程池状态&gt;=STOP，且当前线程没有设置中断状态，wt.interrupt()
-             * 2、如果一开始判断线程池状态&lt;STOP，但Thread.interrupted()为true，即线程已经被中断，又清除了中断标示，再次判断线程池状态是否&gt;=STOP
-             *  是，再次设置中断标示，wt.interrupt()
-             *  否，不做操作，清除中断标示后进行后续步骤
-             */
-            if ((runStateAtLeast(ctl.get(), STOP) ||
-                 (Thread.interrupted() &amp;&amp;
-                  runStateAtLeast(ctl.get(), STOP))) &amp;&amp;
-                !wt.isInterrupted())
-                wt.interrupt();
-            try {
-                // 用户自己实现
-                beforeExecute(wt, task);
-                Throwable thrown = null;
-                try {
-                    // 真正执行任务
-                    task.run();
-                } catch (RuntimeException x) {
-                    thrown = x; throw x;
-                } catch (Error x) {
-                    thrown = x; throw x;
-                } catch (Throwable x) {
-                    thrown = x; throw new Error(x);
-                } finally {
-                    // 用户自己实现
-                    afterExecute(task, thrown);
-                }
-            } finally {
-                task = null;
-                // worker已经完成的任务数 + 1
-                w.completedTasks++;
-                w.unlock();
-            }
-        }
-        completedAbruptly = false;
-    } finally {
-        processWorkerExit(w, completedAbruptly);
-    }
-}
+            <span class="cm">/**</span>
+<span class="cm">             * 确保只有在线程STOP时，才会被设置中断标示，否则清除中断标示</span>
+<span class="cm">             * 1、如果线程池状态&amp;gt;=STOP，且当前线程没有设置中断状态，wt.interrupt()</span>
+<span class="cm">             * 2、如果一开始判断线程池状态&amp;lt;STOP，但Thread.interrupted()为true，即线程已经被中断，又清除了中断标示，再次判断线程池状态是否&amp;gt;=STOP</span>
+<span class="cm">             *  是，再次设置中断标示，wt.interrupt()</span>
+<span class="cm">             *  否，不做操作，清除中断标示后进行后续步骤</span>
+<span class="cm">             */</span>
+            <span class="k">if</span> <span class="o">((</span><span class="n">runStateAtLeast</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">(),</span> <span class="n">STOP</span><span class="o">)</span> <span class="o">||</span>
+                 <span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">interrupted</span><span class="o">()</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span>
+                  <span class="n">runStateAtLeast</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">(),</span> <span class="n">STOP</span><span class="o">)))</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span>
+                <span class="o">!</span><span class="n">wt</span><span class="o">.</span><span class="na">isInterrupted</span><span class="o">())</span>
+                <span class="n">wt</span><span class="o">.</span><span class="na">interrupt</span><span class="o">();</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="c1">// 用户自己实现</span>
+                <span class="n">beforeExecute</span><span class="o">(</span><span class="n">wt</span><span class="o">,</span> <span class="n">task</span><span class="o">);</span>
+                <span class="n">Throwable</span> <span class="n">thrown</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="k">try</span> <span class="o">{</span>
+                    <span class="c1">// 真正执行任务</span>
+                    <span class="n">task</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
+                <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">RuntimeException</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">thrown</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span> <span class="k">throw</span> <span class="n">x</span><span class="o">;</span>
+                <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Error</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">thrown</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span> <span class="k">throw</span> <span class="n">x</span><span class="o">;</span>
+                <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">thrown</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span> <span class="k">throw</span> <span class="k">new</span> <span class="n">Error</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+                <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                    <span class="c1">// 用户自己实现</span>
+                    <span class="n">afterExecute</span><span class="o">(</span><span class="n">task</span><span class="o">,</span> <span class="n">thrown</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="c1">// worker已经完成的任务数 + 1</span>
+                <span class="n">w</span><span class="o">.</span><span class="na">completedTasks</span><span class="o">++;</span>
+                <span class="n">w</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="n">completedAbruptly</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">processWorkerExit</span><span class="o">(</span><span class="n">w</span><span class="o">,</span> <span class="n">completedAbruptly</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * getTask方法用来从阻塞队列中取任务
- * 以下情况会返回null
- * 1、超过了maximumPoolSize设置的线程数量（因为调用了setMaximumPoolSize()）
- * 2、线程池被stop
- * 3、线程池被shutdown，并且workQueue空了
- * 4、线程等待任务超时
- * 返回null表示这个worker要结束了，这种情况下workerCount-1
- */
-private Runnable getTask() {
-    boolean timedOut = false; // 上一次poll()是否超时
+<span class="cm">/**</span>
+<span class="cm"> * getTask方法用来从阻塞队列中取任务</span>
+<span class="cm"> * 以下情况会返回null</span>
+<span class="cm"> * 1、超过了maximumPoolSize设置的线程数量（因为调用了setMaximumPoolSize()）</span>
+<span class="cm"> * 2、线程池被stop</span>
+<span class="cm"> * 3、线程池被shutdown，并且workQueue空了</span>
+<span class="cm"> * 4、线程等待任务超时</span>
+<span class="cm"> * 返回null表示这个worker要结束了，这种情况下workerCount-1</span>
+<span class="cm"> */</span>
+<span class="kd">private</span> <span class="n">Runnable</span> <span class="nf">getTask</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kt">boolean</span> <span class="n">timedOut</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span> <span class="c1">// 上一次poll()是否超时</span>
 
-    for (;;) {
-        int c = ctl.get();
-        int rs = runStateOf(c);
+    <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+        <span class="kt">int</span> <span class="n">rs</span> <span class="o">=</span> <span class="n">runStateOf</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
 
-        /**
-         * 满足以下几点，wc - 1，返回null
-         * 1、rs &gt;= STOP
-         * 2、rs == SHUTDOWN &amp;&amp; workQueue.isEmpty()
-         */
-        if (rs &gt;= SHUTDOWN &amp;&amp; (rs &gt;= STOP || workQueue.isEmpty())) {
-            decrementWorkerCount();
-            return null;
-        }
+        <span class="cm">/**</span>
+<span class="cm">         * 满足以下几点，wc - 1，返回null</span>
+<span class="cm">         * 1、rs &amp;gt;= STOP</span>
+<span class="cm">         * 2、rs == SHUTDOWN &amp;amp;&amp;amp; workQueue.isEmpty()</span>
+<span class="cm">         */</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">rs</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="n">SHUTDOWN</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">(</span><span class="n">rs</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="n">STOP</span> <span class="o">||</span> <span class="n">workQueue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()))</span> <span class="o">{</span>
+            <span class="n">decrementWorkerCount</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
 
-        int wc = workerCountOf(c);
+        <span class="kt">int</span> <span class="n">wc</span> <span class="o">=</span> <span class="n">workerCountOf</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
 
-        // 队列获取值是否要阻塞等待
-        // allowCoreThreadTimeOut默认是false，也就是核心线程不允许进行超时；
-        // wc &gt; corePoolSize，表示当前线程池中的线程数量大于核心线程数量；
-        // 对于超过核心线程数量的这些线程，需要进行超时控制
-        boolean timed = allowCoreThreadTimeOut || wc &gt; corePoolSize;
+        <span class="c1">// 队列获取值是否要阻塞等待</span>
+        <span class="c1">// allowCoreThreadTimeOut默认是false，也就是核心线程不允许进行超时；</span>
+        <span class="c1">// wc &amp;gt; corePoolSize，表示当前线程池中的线程数量大于核心线程数量；</span>
+        <span class="c1">// 对于超过核心线程数量的这些线程，需要进行超时控制</span>
+        <span class="kt">boolean</span> <span class="n">timed</span> <span class="o">=</span> <span class="n">allowCoreThreadTimeOut</span> <span class="o">||</span> <span class="n">wc</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">corePoolSize</span><span class="o">;</span>
 
-        /**
-         * 满足以下几点，wc - 1，返回null
-         * 1、wc &gt; maximumPoolSize
-         * 2、1 &lt; wc &lt;= maximumPoolSize &amp;&amp; timed &amp;&amp; timedOut
-         * 3、wc &lt;= 1 &amp;&amp; workQueue.isEmpty() &amp;&amp; timed &amp;&amp; timedOut
-         */
-        if ((wc &gt; maximumPoolSize || (timed &amp;&amp; timedOut))
-            &amp;&amp; (wc &gt; 1 || workQueue.isEmpty())) {
-            if (compareAndDecrementWorkerCount(c))
-                return null;
-            continue;
-        }
+        <span class="cm">/**</span>
+<span class="cm">         * 满足以下几点，wc - 1，返回null</span>
+<span class="cm">         * 1、wc &amp;gt; maximumPoolSize</span>
+<span class="cm">         * 2、1 &amp;lt; wc &amp;lt;= maximumPoolSize &amp;amp;&amp;amp; timed &amp;amp;&amp;amp; timedOut</span>
+<span class="cm">         * 3、wc &amp;lt;= 1 &amp;amp;&amp;amp; workQueue.isEmpty() &amp;amp;&amp;amp; timed &amp;amp;&amp;amp; timedOut</span>
+<span class="cm">         */</span>
+        <span class="k">if</span> <span class="o">((</span><span class="n">wc</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">maximumPoolSize</span> <span class="o">||</span> <span class="o">(</span><span class="n">timed</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">timedOut</span><span class="o">))</span>
+            <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">(</span><span class="n">wc</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="mi">1</span> <span class="o">||</span> <span class="n">workQueue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()))</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">compareAndDecrementWorkerCount</span><span class="o">(</span><span class="n">c</span><span class="o">))</span>
+                <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span>
 
-        try {
-            // 获取Runnable
-            Runnable r = timed ?
-                workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
-                workQueue.take();
-            if (r != null)
-                return r;
-            timedOut = true;
-        } catch (InterruptedException retry) {
-            timedOut = false;
-        }
-    }
-}
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// 获取Runnable</span>
+            <span class="n">Runnable</span> <span class="n">r</span> <span class="o">=</span> <span class="n">timed</span> <span class="o">?</span>
+                <span class="n">workQueue</span><span class="o">.</span><span class="na">poll</span><span class="o">(</span><span class="n">keepAliveTime</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">NANOSECONDS</span><span class="o">)</span> <span class="o">:</span>
+                <span class="n">workQueue</span><span class="o">.</span><span class="na">take</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">r</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+                <span class="k">return</span> <span class="n">r</span><span class="o">;</span>
+            <span class="n">timedOut</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">retry</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">timedOut</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * @param completedAbruptly true：worker执行的时候异常了
- */
-private void processWorkerExit(Worker w, boolean completedAbruptly) {
-    /**
-     * 1、worker数量-1
-     * 如果是突然终止，说明是task执行时异常情况导致，即run()方法执行时发生了异常，那么正在工作的worker线程数量需要-1
-     * 如果不是突然终止，说明是worker线程没有task可执行了，不用-1，因为已经在getTask()方法中-1了
-     */
-    if (completedAbruptly)
-        decrementWorkerCount();
+<span class="cm">/**</span>
+<span class="cm"> * @param completedAbruptly true：worker执行的时候异常了</span>
+<span class="cm"> */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">processWorkerExit</span><span class="o">(</span><span class="n">Worker</span> <span class="n">w</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">completedAbruptly</span><span class="o">)</span> <span class="o">{</span>
+    <span class="cm">/**</span>
+<span class="cm">     * 1、worker数量-1</span>
+<span class="cm">     * 如果是突然终止，说明是task执行时异常情况导致，即run()方法执行时发生了异常，那么正在工作的worker线程数量需要-1</span>
+<span class="cm">     * 如果不是突然终止，说明是worker线程没有task可执行了，不用-1，因为已经在getTask()方法中-1了</span>
+<span class="cm">     */</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">completedAbruptly</span><span class="o">)</span>
+        <span class="n">decrementWorkerCount</span><span class="o">();</span>
 
-    /**
-     * 2、从Workers Set中移除worker
-     */
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        // 统计完成的任务数
-        completedTaskCount += w.completedTasks;
-        // 从workers中移除，也就表示着从线程池中移除了一个工作线程
-        workers.remove(w);
-    } finally {
-        mainLock.unlock();
-    }
+    <span class="cm">/**</span>
+<span class="cm">     * 2、从Workers Set中移除worker</span>
+<span class="cm">     */</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="c1">// 统计完成的任务数</span>
+        <span class="n">completedTaskCount</span> <span class="o">+=</span> <span class="n">w</span><span class="o">.</span><span class="na">completedTasks</span><span class="o">;</span>
+        <span class="c1">// 从workers中移除，也就表示着从线程池中移除了一个工作线程</span>
+        <span class="n">workers</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">w</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
 
-    /**
-     * 3、在对线程池有负效益的操作时，都需要“尝试终止”线程池
-     * 主要是判断线程池是否满足终止的状态
-     * 如果状态满足，但还有线程池还有线程，尝试对其发出中断响应，使其能进入退出流程
-     * 没有线程了，更新状态为tidying-&gt;terminated
-     */
-    tryTerminate();
+    <span class="cm">/**</span>
+<span class="cm">     * 3、在对线程池有负效益的操作时，都需要“尝试终止”线程池</span>
+<span class="cm">     * 主要是判断线程池是否满足终止的状态</span>
+<span class="cm">     * 如果状态满足，但还有线程池还有线程，尝试对其发出中断响应，使其能进入退出流程</span>
+<span class="cm">     * 没有线程了，更新状态为tidying-&amp;gt;terminated</span>
+<span class="cm">     */</span>
+    <span class="n">tryTerminate</span><span class="o">();</span>
 
-    /**
-     * 4、是否需要增加worker线程
-     * 线程池状态是running 或 shutdown
-     * 如果当前线程是突然终止的，addWorker()
-     * 如果当前线程不是突然终止的，但当前线程数量 &lt; 要维护的线程数量，addWorker()
-     * 故如果调用线程池shutdown()，直到workQueue为空前，线程池都会维持corePoolSize个线程，然后再逐渐销毁这corePoolSize个线程
-     */
-    int c = ctl.get();
-    /**
-     * 以下情况会增加一个worker addWorker(null, false);
-     * 1、completedAbruptly == true
-     * 2、completedAbruptly == false &amp;&amp; allowCoreThreadTimeOut == true &amp;&amp; wc &lt; 1
-     * 3、completedAbruptly == false &amp;&amp; allowCoreThreadTimeOut == false &amp;&amp; wc &lt; corePoolSize
-     */
-    if (runStateLessThan(c, STOP)) {
-        if (!completedAbruptly) {
-            int min = allowCoreThreadTimeOut ? 0 : corePoolSize;
-            if (min == 0 &amp;&amp; ! workQueue.isEmpty())
-                min = 1;
-            if (workerCountOf(c) &gt;= min)
-                return; // replacement not needed
-        }
-        addWorker(null, false);
-    }
-}
-</code></pre>
+    <span class="cm">/**</span>
+<span class="cm">     * 4、是否需要增加worker线程</span>
+<span class="cm">     * 线程池状态是running 或 shutdown</span>
+<span class="cm">     * 如果当前线程是突然终止的，addWorker()</span>
+<span class="cm">     * 如果当前线程不是突然终止的，但当前线程数量 &amp;lt; 要维护的线程数量，addWorker()</span>
+<span class="cm">     * 故如果调用线程池shutdown()，直到workQueue为空前，线程池都会维持corePoolSize个线程，然后再逐渐销毁这corePoolSize个线程</span>
+<span class="cm">     */</span>
+    <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+    <span class="cm">/**</span>
+<span class="cm">     * 以下情况会增加一个worker addWorker(null, false);</span>
+<span class="cm">     * 1、completedAbruptly == true</span>
+<span class="cm">     * 2、completedAbruptly == false &amp;amp;&amp;amp; allowCoreThreadTimeOut == true &amp;amp;&amp;amp; wc &amp;lt; 1</span>
+<span class="cm">     * 3、completedAbruptly == false &amp;amp;&amp;amp; allowCoreThreadTimeOut == false &amp;amp;&amp;amp; wc &amp;lt; corePoolSize</span>
+<span class="cm">     */</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">runStateLessThan</span><span class="o">(</span><span class="n">c</span><span class="o">,</span> <span class="n">STOP</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">completedAbruptly</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">min</span> <span class="o">=</span> <span class="n">allowCoreThreadTimeOut</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="n">corePoolSize</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">min</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">!</span> <span class="n">workQueue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span>
+                <span class="n">min</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">workerCountOf</span><span class="o">(</span><span class="n">c</span><span class="o">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="n">min</span><span class="o">)</span>
+                <span class="k">return</span><span class="o">;</span> <span class="c1">// replacement not needed</span>
+        <span class="o">}</span>
+        <span class="n">addWorker</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>getTask重要的地方是第二个if判断，目的是控制线程池的有效线程数量。由上文中的分析可以知道，在执行execute方法时，如果当前线程池的线程数量超过了corePoolSize且小于maximumPoolSize，并且workQueue已满时，则可以增加工作线程，但这时如果超时没有获取到任务，也就是timedOut为true的情况，说明workQueue已经为空了，也就说明了当前线程池中不需要那么多线程来执行任务了，可以把多于corePoolSize数量的线程销毁掉，保持线程数量在corePoolSize即可。</p>
 
@@ -702,432 +721,434 @@ private void processWorkerExit(Worker w, boolean completedAbruptly) {
 
 <p>下面的方法都是用户可以自己进行调用的：</p>
 
-<pre><code>/**
- * 状态改为SHUTDOWN
- * 启动先前提交的任务被执行的有序关闭，但不接受新的任务。 如果已经关闭，则调用没有其他影响。
- * 该方法不能等待之前提交的任务执行完，如果需要等待执行，可以使用{@link #awaitTermination awaitTermination}
- */
-public void shutdown() {
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        checkShutdownAccess();
-        advanceRunState(SHUTDOWN);
-        interruptIdleWorkers();
-        onShutdown(); // hook for ScheduledThreadPoolExecutor
-    } finally {
-        mainLock.unlock();
-    }
-    tryTerminate();
-}
+<div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * 状态改为SHUTDOWN</span>
+<span class="cm"> * 启动先前提交的任务被执行的有序关闭，但不接受新的任务。 如果已经关闭，则调用没有其他影响。</span>
+<span class="cm"> * 该方法不能等待之前提交的任务执行完，如果需要等待执行，可以使用{@link #awaitTermination awaitTermination}</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">shutdown</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">checkShutdownAccess</span><span class="o">();</span>
+        <span class="n">advanceRunState</span><span class="o">(</span><span class="n">SHUTDOWN</span><span class="o">);</span>
+        <span class="n">interruptIdleWorkers</span><span class="o">();</span>
+        <span class="n">onShutdown</span><span class="o">();</span> <span class="c1">// hook for ScheduledThreadPoolExecutor</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="n">tryTerminate</span><span class="o">();</span>
+<span class="o">}</span>
 
-/**
- * 状态改为SHUTDOWN
- * 尝试停止所有正在执行的任务，停止等待任务的处理，并返回正在等待执行的任务的列表。 
- * 该方法不能等待之前提交的任务执行完，如果需要等待执行，可以使用{@link #awaitTermination awaitTermination}
- * 从这个方法返回后，这些任务从任务队列中排出（移除）。 除了竭尽全力地停止处理主动执行任务之外，没有任何保证。 
- * 这个实现通过{@link Thread＃interrupt}来取消任务，所以任何不能响应中断的任务都不会终止。
- */
-public List&lt;Runnable&gt; shutdownNow() {
-    List&lt;Runnable&gt; tasks;
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        checkShutdownAccess();
-        advanceRunState(STOP);
-        interruptWorkers();
-        tasks = drainQueue();
-    } finally {
-        mainLock.unlock();
-    }
-    tryTerminate();
-    return tasks;
-}
+<span class="cm">/**</span>
+<span class="cm"> * 状态改为SHUTDOWN</span>
+<span class="cm"> * 尝试停止所有正在执行的任务，停止等待任务的处理，并返回正在等待执行的任务的列表。 </span>
+<span class="cm"> * 该方法不能等待之前提交的任务执行完，如果需要等待执行，可以使用{@link #awaitTermination awaitTermination}</span>
+<span class="cm"> * 从这个方法返回后，这些任务从任务队列中排出（移除）。 除了竭尽全力地停止处理主动执行任务之外，没有任何保证。 </span>
+<span class="cm"> * 这个实现通过{@link Thread＃interrupt}来取消任务，所以任何不能响应中断的任务都不会终止。</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">shutdownNow</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">tasks</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">checkShutdownAccess</span><span class="o">();</span>
+        <span class="n">advanceRunState</span><span class="o">(</span><span class="n">STOP</span><span class="o">);</span>
+        <span class="n">interruptWorkers</span><span class="o">();</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="n">drainQueue</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="n">tryTerminate</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">tasks</span><span class="o">;</span>
+<span class="o">}</span>
 
-// 执行任务前的hook
-protected void beforeExecute(Thread t, Runnable r) { }
+<span class="c1">// 执行任务前的hook</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">beforeExecute</span><span class="o">(</span><span class="n">Thread</span> <span class="n">t</span><span class="o">,</span> <span class="n">Runnable</span> <span class="n">r</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>
 
-// 执行任务后的hook
-protected void afterExecute(Runnable r, Throwable t) { }
+<span class="c1">// 执行任务后的hook</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">afterExecute</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">r</span><span class="o">,</span> <span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>
 
-/**
- * 什么都不做，交给子类实现，注意实现的时候使用super.terminated();
- */
-protected void terminated() { }
+<span class="cm">/**</span>
+<span class="cm"> * 什么都不做，交给子类实现，注意实现的时候使用super.terminated();</span>
+<span class="cm"> */</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">terminated</span><span class="o">()</span> <span class="o">{</span> <span class="o">}</span>
 
-/**
- * 判断状态 &gt;= SHUTDOWN
- */
-public boolean isShutdown() {
-    return ! isRunning(ctl.get());
-}
+<span class="cm">/**</span>
+<span class="cm"> * 判断状态 &amp;gt;= SHUTDOWN</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isShutdown</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="o">!</span> <span class="n">isRunning</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="o">}</span>
 
-/**
- * 判断 SHUTDOWN &lt;= 状态 &lt; TERMINATED
- */
-public boolean isTerminating() {
-    int c = ctl.get();
-    return ! isRunning(c) &amp;&amp; runStateLessThan(c, TERMINATED);
-}
+<span class="cm">/**</span>
+<span class="cm"> * 判断 SHUTDOWN &amp;lt;= 状态 &amp;lt; TERMINATED</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isTerminating</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+    <span class="k">return</span> <span class="o">!</span> <span class="n">isRunning</span><span class="o">(</span><span class="n">c</span><span class="o">)</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">runStateLessThan</span><span class="o">(</span><span class="n">c</span><span class="o">,</span> <span class="n">TERMINATED</span><span class="o">);</span>
+<span class="o">}</span>
 
-/**
- * 判断状态 == TERMINATED
- */
-public boolean isTerminated() {
-    return runStateAtLeast(ctl.get(), TERMINATED);
-}
+<span class="cm">/**</span>
+<span class="cm"> * 判断状态 == TERMINATED</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isTerminated</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">runStateAtLeast</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">(),</span> <span class="n">TERMINATED</span><span class="o">);</span>
+<span class="o">}</span>
 
-/**
- * 在指定的超时时间范围内等待状态变为TERMINATED
- */
-public boolean awaitTermination(long timeout, TimeUnit unit)
-    throws InterruptedException {
-    long nanos = unit.toNanos(timeout);
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        for (;;) {
-            if (runStateAtLeast(ctl.get(), TERMINATED))
-                return true;
-            if (nanos &lt;= 0)
-                return false;
-            nanos = termination.awaitNanos(nanos);
-        }
-    } finally {
-        mainLock.unlock();
-    }
-}
+<span class="cm">/**</span>
+<span class="cm"> * 在指定的超时时间范围内等待状态变为TERMINATED</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">awaitTermination</span><span class="o">(</span><span class="kt">long</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">TimeUnit</span> <span class="n">unit</span><span class="o">)</span>
+    <span class="kd">throws</span> <span class="n">InterruptedException</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">nanos</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="na">toNanos</span><span class="o">(</span><span class="n">timeout</span><span class="o">);</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">runStateAtLeast</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">(),</span> <span class="n">TERMINATED</span><span class="o">))</span>
+                <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">nanos</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;=</span> <span class="mi">0</span><span class="o">)</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="n">nanos</span> <span class="o">=</span> <span class="n">termination</span><span class="o">.</span><span class="na">awaitNanos</span><span class="o">(</span><span class="n">nanos</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-public void setCorePoolSize(int corePoolSize) {
-    if (corePoolSize &lt; 0)
-        throw new IllegalArgumentException();
-    int delta = corePoolSize - this.corePoolSize;
-    this.corePoolSize = corePoolSize;
-    /**
-     * 1、当前workCount &gt; 传入的corePoolSize，中断空闲worker
-     * 2、传入的corePoolSize比之前的要大，选出差值和queue的大小做比较，比较小的作为要增加的线程数，调用addWorker，如果中途遇到workQueue为空，就不增加了。
-     */
-    if (workerCountOf(ctl.get()) &gt; corePoolSize)
-        interruptIdleWorkers();
-    else if (delta &gt; 0) {
-        int k = Math.min(delta, workQueue.size());
-        while (k-- &gt; 0 &amp;&amp; addWorker(null, true)) {
-            if (workQueue.isEmpty())
-                break;
-        }
-    }
-}
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCorePoolSize</span><span class="o">(</span><span class="kt">int</span> <span class="n">corePoolSize</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">corePoolSize</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="mi">0</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">();</span>
+    <span class="kt">int</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">corePoolSize</span> <span class="o">-</span> <span class="k">this</span><span class="o">.</span><span class="na">corePoolSize</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">corePoolSize</span> <span class="o">=</span> <span class="n">corePoolSize</span><span class="o">;</span>
+    <span class="cm">/**</span>
+<span class="cm">     * 1、当前workCount &amp;gt; 传入的corePoolSize，中断空闲worker</span>
+<span class="cm">     * 2、传入的corePoolSize比之前的要大，选出差值和queue的大小做比较，比较小的作为要增加的线程数，调用addWorker，如果中途遇到workQueue为空，就不增加了。</span>
+<span class="cm">     */</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">workerCountOf</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">())</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">corePoolSize</span><span class="o">)</span>
+        <span class="n">interruptIdleWorkers</span><span class="o">();</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">delta</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">delta</span><span class="o">,</span> <span class="n">workQueue</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">k</span><span class="o">--</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="mi">0</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">addWorker</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">true</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">workQueue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span>
+                <span class="k">break</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * 提前准备一个core的线程
- */
-public boolean prestartCoreThread() {
-    return workerCountOf(ctl.get()) &lt; corePoolSize &amp;&amp;
-        addWorker(null, true);
-}
+<span class="cm">/**</span>
+<span class="cm"> * 提前准备一个core的线程</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">prestartCoreThread</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">workerCountOf</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">())</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">corePoolSize</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span>
+        <span class="n">addWorker</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+<span class="o">}</span>
 
-/**
- * 提前准备所有的core线程
- */
-public int prestartAllCoreThreads() {
-    int n = 0;
-    while (addWorker(null, true))
-        ++n;
-    return n;
-}
+<span class="cm">/**</span>
+<span class="cm"> * 提前准备所有的core线程</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">prestartAllCoreThreads</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">addWorker</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">true</span><span class="o">))</span>
+        <span class="o">++</span><span class="n">n</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">n</span><span class="o">;</span>
+<span class="o">}</span>
 
-// 设置coreThreadTimeOut的值
-public void allowCoreThreadTimeOut(boolean value) {
-    if (value &amp;&amp; keepAliveTime &lt;= 0)
-        throw new IllegalArgumentException("Core threads must have nonzero keep alive times");
-    if (value != allowCoreThreadTimeOut) {
-        allowCoreThreadTimeOut = value;
-        if (value)
-            interruptIdleWorkers();
-    }
-}
+<span class="c1">// 设置coreThreadTimeOut的值</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">allowCoreThreadTimeOut</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">value</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">keepAliveTime</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;=</span> <span class="mi">0</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&quot;Core threads must have nonzero keep alive times&quot;</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">value</span> <span class="o">!=</span> <span class="n">allowCoreThreadTimeOut</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">allowCoreThreadTimeOut</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">value</span><span class="o">)</span>
+            <span class="n">interruptIdleWorkers</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-// 设置maximumPoolSize
-public void setMaximumPoolSize(int maximumPoolSize) {
-    if (maximumPoolSize &lt;= 0 || maximumPoolSize &lt; corePoolSize)
-        throw new IllegalArgumentException();
-    this.maximumPoolSize = maximumPoolSize;
-    if (workerCountOf(ctl.get()) &gt; maximumPoolSize)
-        interruptIdleWorkers();
-}
+<span class="c1">// 设置maximumPoolSize</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">setMaximumPoolSize</span><span class="o">(</span><span class="kt">int</span> <span class="n">maximumPoolSize</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">maximumPoolSize</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">maximumPoolSize</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">corePoolSize</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">();</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">maximumPoolSize</span> <span class="o">=</span> <span class="n">maximumPoolSize</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">workerCountOf</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">())</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">maximumPoolSize</span><span class="o">)</span>
+        <span class="n">interruptIdleWorkers</span><span class="o">();</span>
+<span class="o">}</span>
 
-// 从队列里面移除任务
-public boolean remove(Runnable task) {
-    boolean removed = workQueue.remove(task);
-    tryTerminate(); // In case SHUTDOWN and now empty
-    return removed;
-}
+<span class="c1">// 从队列里面移除任务</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">task</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">boolean</span> <span class="n">removed</span> <span class="o">=</span> <span class="n">workQueue</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">task</span><span class="o">);</span>
+    <span class="n">tryTerminate</span><span class="o">();</span> <span class="c1">// In case SHUTDOWN and now empty</span>
+    <span class="k">return</span> <span class="n">removed</span><span class="o">;</span>
+<span class="o">}</span>
 
-/**
- * 清除队列里所有呗cancel的Future类型的任务，此方法可用作存储回收操作
- * 该方法可能存在其他线程的干扰，导致清除失败
- */
-public void purge() {
-    final BlockingQueue&lt;Runnable&gt; q = workQueue;
-    try {
-        Iterator&lt;Runnable&gt; it = q.iterator();
-        while (it.hasNext()) {
-            Runnable r = it.next();
-            if (r instanceof Future&lt;?&gt; &amp;&amp; ((Future&lt;?&gt;)r).isCancelled())
-                it.remove();
-        }
-    } catch (ConcurrentModificationException fallThrough) {
-        // 如果在遍历期间遇到干扰，请采取慢速路径。进行遍历复制并调用remove取消条目。慢路径更可能是O（N * N）。
-        for (Object r : q.toArray())
-            if (r instanceof Future&lt;?&gt; &amp;&amp; ((Future&lt;?&gt;)r).isCancelled())
-                q.remove(r);
-    }
+<span class="cm">/**</span>
+<span class="cm"> * 清除队列里所有呗cancel的Future类型的任务，此方法可用作存储回收操作</span>
+<span class="cm"> * 该方法可能存在其他线程的干扰，导致清除失败</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">purge</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">BlockingQueue</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">workQueue</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">Iterator</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">it</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">Runnable</span> <span class="n">r</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">r</span> <span class="k">instanceof</span> <span class="n">Future</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">((</span><span class="n">Future</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?&amp;</span><span class="n">gt</span><span class="o">;)</span><span class="n">r</span><span class="o">).</span><span class="na">isCancelled</span><span class="o">())</span>
+                <span class="n">it</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ConcurrentModificationException</span> <span class="n">fallThrough</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 如果在遍历期间遇到干扰，请采取慢速路径。进行遍历复制并调用remove取消条目。慢路径更可能是O（N * N）。</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Object</span> <span class="n">r</span> <span class="o">:</span> <span class="n">q</span><span class="o">.</span><span class="na">toArray</span><span class="o">())</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">r</span> <span class="k">instanceof</span> <span class="n">Future</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">((</span><span class="n">Future</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?&amp;</span><span class="n">gt</span><span class="o">;)</span><span class="n">r</span><span class="o">).</span><span class="na">isCancelled</span><span class="o">())</span>
+                <span class="n">q</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">r</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    tryTerminate(); // In case SHUTDOWN and now empty
-}
+    <span class="n">tryTerminate</span><span class="o">();</span> <span class="c1">// In case SHUTDOWN and now empty</span>
+<span class="o">}</span>
 
-/**
- * 返回线程池大小
- */
-public int getPoolSize() {
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        // runState == TIDYING 或者 runState == TERMINATED 返回0
-        // 否则返回workers的大小
-        return runStateAtLeast(ctl.get(), TIDYING) ? 0
-            : workers.size();
-    } finally {
-        mainLock.unlock();
-    }
-}
+<span class="cm">/**</span>
+<span class="cm"> * 返回线程池大小</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getPoolSize</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="c1">// runState == TIDYING 或者 runState == TERMINATED 返回0</span>
+        <span class="c1">// 否则返回workers的大小</span>
+        <span class="k">return</span> <span class="n">runStateAtLeast</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">(),</span> <span class="n">TIDYING</span><span class="o">)</span> <span class="o">?</span> <span class="mi">0</span>
+            <span class="o">:</span> <span class="n">workers</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * 获取活跃线程数：根据isLocked来判断是不是在执行任务
- */
-public int getActiveCount() {
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        int n = 0;
-        for (Worker w : workers)
-            if (w.isLocked())
-                ++n;
-        return n;
-    } finally {
-        mainLock.unlock();
-    }
-}
+<span class="cm">/**</span>
+<span class="cm"> * 获取活跃线程数：根据isLocked来判断是不是在执行任务</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getActiveCount</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Worker</span> <span class="n">w</span> <span class="o">:</span> <span class="n">workers</span><span class="o">)</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">w</span><span class="o">.</span><span class="na">isLocked</span><span class="o">())</span>
+                <span class="o">++</span><span class="n">n</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">n</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * 返回最大线程池的大小
- */
-public int getLargestPoolSize() {
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        return largestPoolSize;
-    } finally {
-        mainLock.unlock();
-    }
-}
+<span class="cm">/**</span>
+<span class="cm"> * 返回最大线程池的大小</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getLargestPoolSize</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">largestPoolSize</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * 返回任务总数（包括已经完成的和未完成的）
- */
-public long getTaskCount() {
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        long n = completedTaskCount;
-        for (Worker w : workers) {
-            n += w.completedTasks;
-            if (w.isLocked())
-                ++n;
-        }
-        return n + workQueue.size();
-    } finally {
-        mainLock.unlock();
-    }
-}
+<span class="cm">/**</span>
+<span class="cm"> * 返回任务总数（包括已经完成的和未完成的）</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">long</span> <span class="nf">getTaskCount</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="kt">long</span> <span class="n">n</span> <span class="o">=</span> <span class="n">completedTaskCount</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Worker</span> <span class="n">w</span> <span class="o">:</span> <span class="n">workers</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="n">w</span><span class="o">.</span><span class="na">completedTasks</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">w</span><span class="o">.</span><span class="na">isLocked</span><span class="o">())</span>
+                <span class="o">++</span><span class="n">n</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">n</span> <span class="o">+</span> <span class="n">workQueue</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * 返回已完成任务总数
- */
-public long getCompletedTaskCount() {
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        long n = completedTaskCount;
-        for (Worker w : workers)
-            n += w.completedTasks;
-        return n;
-    } finally {
-        mainLock.unlock();
-    }
-}
-</code></pre>
+<span class="cm">/**</span>
+<span class="cm"> * 返回已完成任务总数</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">long</span> <span class="nf">getCompletedTaskCount</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="kt">long</span> <span class="n">n</span> <span class="o">=</span> <span class="n">completedTaskCount</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Worker</span> <span class="n">w</span> <span class="o">:</span> <span class="n">workers</span><span class="o">)</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="n">w</span><span class="o">.</span><span class="na">completedTasks</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">n</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <h3>3.5、内部方法以及空方法</h3>
 
 <p>下面的方法都是用户自己调用不了的方法，这里也做一下说明：</p>
 
-<pre><code>/**
- * 替换状态
- * 如果现在的ctl状态 &gt;= targetState，什么都不做
- * 如果现在的ctl状态 &lt; targetState，尝试替换状态
- */
-private void advanceRunState(int targetState) {
-    for (;;) {
-        int c = ctl.get();
-        if (runStateAtLeast(c, targetState) ||
-            // 前3位替换，后29位保持ctl原来的数目
-            ctl.compareAndSet(c, ctlOf(targetState, workerCountOf(c))))
-            break;
-    }
-}
+<div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * 替换状态</span>
+<span class="cm"> * 如果现在的ctl状态 &amp;gt;= targetState，什么都不做</span>
+<span class="cm"> * 如果现在的ctl状态 &amp;lt; targetState，尝试替换状态</span>
+<span class="cm"> */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">advanceRunState</span><span class="o">(</span><span class="kt">int</span> <span class="n">targetState</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">runStateAtLeast</span><span class="o">(</span><span class="n">c</span><span class="o">,</span> <span class="n">targetState</span><span class="o">)</span> <span class="o">||</span>
+            <span class="c1">// 前3位替换，后29位保持ctl原来的数目</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="na">compareAndSet</span><span class="o">(</span><span class="n">c</span><span class="o">,</span> <span class="n">ctlOf</span><span class="o">(</span><span class="n">targetState</span><span class="o">,</span> <span class="n">workerCountOf</span><span class="o">(</span><span class="n">c</span><span class="o">))))</span>
+            <span class="k">break</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * 尝试终止，只有当以下几种情况才把状态改为TERMINATED
- *      1、SHUTDOWN状态 &amp;&amp; queue是空的 &amp;&amp; wc == 0
- *      2、STOP状态 &amp;&amp; wc == 0
- * workCount如果不是0，这时候就中断其中一个idle的worker来传播关闭信号
- * 该方法必须在执行任何可能会终止的操作之后调用此方法 - 在关闭期间减少工作人员数量或从队列中删除任务。
- * ScheduledThreadPoolExecutor里面也用到了，所以这里修饰符没用private
- */
-final void tryTerminate() {
-    for (;;) {
-        int c = ctl.get();
-        // c是运行时的状态
-        if (isRunning(c) ||
-            // c的状态值 &gt;= TIDYING
-            runStateAtLeast(c, TIDYING) ||
-            // c的状态是SHUTDOWN &amp;&amp; 队列不是空
-            (runStateOf(c) == SHUTDOWN &amp;&amp; ! workQueue.isEmpty()))
-            return;
+<span class="cm">/**</span>
+<span class="cm"> * 尝试终止，只有当以下几种情况才把状态改为TERMINATED</span>
+<span class="cm"> *      1、SHUTDOWN状态 &amp;amp;&amp;amp; queue是空的 &amp;amp;&amp;amp; wc == 0</span>
+<span class="cm"> *      2、STOP状态 &amp;amp;&amp;amp; wc == 0</span>
+<span class="cm"> * workCount如果不是0，这时候就中断其中一个idle的worker来传播关闭信号</span>
+<span class="cm"> * 该方法必须在执行任何可能会终止的操作之后调用此方法 - 在关闭期间减少工作人员数量或从队列中删除任务。</span>
+<span class="cm"> * ScheduledThreadPoolExecutor里面也用到了，所以这里修饰符没用private</span>
+<span class="cm"> */</span>
+<span class="kd">final</span> <span class="kt">void</span> <span class="nf">tryTerminate</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+        <span class="c1">// c是运行时的状态</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">isRunning</span><span class="o">(</span><span class="n">c</span><span class="o">)</span> <span class="o">||</span>
+            <span class="c1">// c的状态值 &amp;gt;= TIDYING</span>
+            <span class="n">runStateAtLeast</span><span class="o">(</span><span class="n">c</span><span class="o">,</span> <span class="n">TIDYING</span><span class="o">)</span> <span class="o">||</span>
+            <span class="c1">// c的状态是SHUTDOWN &amp;amp;&amp;amp; 队列不是空</span>
+            <span class="o">(</span><span class="n">runStateOf</span><span class="o">(</span><span class="n">c</span><span class="o">)</span> <span class="o">==</span> <span class="n">SHUTDOWN</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">!</span> <span class="n">workQueue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()))</span>
+            <span class="k">return</span><span class="o">;</span>
 
-        // worker数不是0
-        if (workerCountOf(c) != 0) { // Eligible to terminate
-            interruptIdleWorkers(ONLY_ONE);
-            return;
-        }
+        <span class="c1">// worker数不是0</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">workerCountOf</span><span class="o">(</span><span class="n">c</span><span class="o">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// Eligible to terminate</span>
+            <span class="n">interruptIdleWorkers</span><span class="o">(</span><span class="n">ONLY_ONE</span><span class="o">);</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
 
-        final ReentrantLock mainLock = this.mainLock;
-        mainLock.lock();
-        try {
-            // 设置ctl的状态为TIDYING，为中间过渡状态
-            if (ctl.compareAndSet(c, ctlOf(TIDYING, 0))) {
-                try {
-                    // 终止方法，空方法什么都不做，子类去实现
-                    terminated();
-                } finally {
-                    // 设置ctl的状态为TERMINATED
-                    ctl.set(ctlOf(TERMINATED, 0));
-                    termination.signalAll();
-                }
-                return;
-            }
-        } finally {
-            mainLock.unlock();
-        }
-    }
-}
+        <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// 设置ctl的状态为TIDYING，为中间过渡状态</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">compareAndSet</span><span class="o">(</span><span class="n">c</span><span class="o">,</span> <span class="n">ctlOf</span><span class="o">(</span><span class="n">TIDYING</span><span class="o">,</span> <span class="mi">0</span><span class="o">)))</span> <span class="o">{</span>
+                <span class="k">try</span> <span class="o">{</span>
+                    <span class="c1">// 终止方法，空方法什么都不做，子类去实现</span>
+                    <span class="n">terminated</span><span class="o">();</span>
+                <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                    <span class="c1">// 设置ctl的状态为TERMINATED</span>
+                    <span class="n">ctl</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">ctlOf</span><span class="o">(</span><span class="n">TERMINATED</span><span class="o">,</span> <span class="mi">0</span><span class="o">));</span>
+                    <span class="n">termination</span><span class="o">.</span><span class="na">signalAll</span><span class="o">();</span>
+                <span class="o">}</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * 中断worker的空闲线程
- * @param onlyOne 是否仅仅中断worker中的第一个
- */
-private void interruptIdleWorkers(boolean onlyOne) {
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        for (Worker w : workers) {
-            Thread t = w.thread;
-            // 尝试获取锁，这里只有当线程没有运行的时候才能够tryLock成功
-            if (!t.isInterrupted() &amp;&amp; w.tryLock()) {
-                try {
-                    // 设置worker线程的中断变量
-                    t.interrupt();
-                } catch (SecurityException ignore) {
-                } finally {
-                    w.unlock();
-                }
-            }
-            // true，只中断队列的第一个就退出
-            if (onlyOne)
-                break;
-        }
-    } finally {
-        mainLock.unlock();
-    }
-}
+<span class="cm">/**</span>
+<span class="cm"> * 中断worker的空闲线程</span>
+<span class="cm"> * @param onlyOne 是否仅仅中断worker中的第一个</span>
+<span class="cm"> */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">interruptIdleWorkers</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">onlyOne</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Worker</span> <span class="n">w</span> <span class="o">:</span> <span class="n">workers</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="na">thread</span><span class="o">;</span>
+            <span class="c1">// 尝试获取锁，这里只有当线程没有运行的时候才能够tryLock成功</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="n">t</span><span class="o">.</span><span class="na">isInterrupted</span><span class="o">()</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">w</span><span class="o">.</span><span class="na">tryLock</span><span class="o">())</span> <span class="o">{</span>
+                <span class="k">try</span> <span class="o">{</span>
+                    <span class="c1">// 设置worker线程的中断变量</span>
+                    <span class="n">t</span><span class="o">.</span><span class="na">interrupt</span><span class="o">();</span>
+                <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SecurityException</span> <span class="n">ignore</span><span class="o">)</span> <span class="o">{</span>
+                <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                    <span class="n">w</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+            <span class="c1">// true，只中断队列的第一个就退出</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">onlyOne</span><span class="o">)</span>
+                <span class="k">break</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * 中断所有worker的线程
- */
-private void interruptWorkers() {
-    final ReentrantLock mainLock = this.mainLock;
-    mainLock.lock();
-    try {
-        for (Worker w : workers)
-            w.interruptIfStarted();
-    } finally {
-        mainLock.unlock();
-    }
-}
+<span class="cm">/**</span>
+<span class="cm"> * 中断所有worker的线程</span>
+<span class="cm"> */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">interruptWorkers</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">ReentrantLock</span> <span class="n">mainLock</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mainLock</span><span class="o">;</span>
+    <span class="n">mainLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Worker</span> <span class="n">w</span> <span class="o">:</span> <span class="n">workers</span><span class="o">)</span>
+            <span class="n">w</span><span class="o">.</span><span class="na">interruptIfStarted</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">mainLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-/**
- * 中断所有worker的空闲线程
- */
-private void interruptIdleWorkers() {
-    interruptIdleWorkers(false);
-}
+<span class="cm">/**</span>
+<span class="cm"> * 中断所有worker的空闲线程</span>
+<span class="cm"> */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">interruptIdleWorkers</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">interruptIdleWorkers</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+<span class="o">}</span>
 
-/**
- * 根据拒绝策略拒绝执行命令
- */
-final void reject(Runnable command) {
-    handler.rejectedExecution(command, this);
-}
+<span class="cm">/**</span>
+<span class="cm"> * 根据拒绝策略拒绝执行命令</span>
+<span class="cm"> */</span>
+<span class="kd">final</span> <span class="kt">void</span> <span class="nf">reject</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">command</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">handler</span><span class="o">.</span><span class="na">rejectedExecution</span><span class="o">(</span><span class="n">command</span><span class="o">,</span> <span class="k">this</span><span class="o">);</span>
+<span class="o">}</span>
 
-/**
- * 移除队列中的Runnable到一个新list中，使用的是阻塞队列的drainTo方法
- * 但是如果队列是DelayQueue或者其他能够让poll或者drainTo失败移除元素的队列的话，遍历队列并删除它
- */
-private List&lt;Runnable&gt; drainQueue() {
-    BlockingQueue&lt;Runnable&gt; q = workQueue;
-    ArrayList&lt;Runnable&gt; taskList = new ArrayList&lt;Runnable&gt;();
-    q.drainTo(taskList);
-    if (!q.isEmpty()) {
-        for (Runnable r : q.toArray(new Runnable[0])) {
-            if (q.remove(r))
-                taskList.add(r);
-        }
-    }
-    return taskList;
-}
+<span class="cm">/**</span>
+<span class="cm"> * 移除队列中的Runnable到一个新list中，使用的是阻塞队列的drainTo方法</span>
+<span class="cm"> * 但是如果队列是DelayQueue或者其他能够让poll或者drainTo失败移除元素的队列的话，遍历队列并删除它</span>
+<span class="cm"> */</span>
+<span class="kd">private</span> <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">drainQueue</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">BlockingQueue</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">workQueue</span><span class="o">;</span>
+    <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">taskList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Runnable</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;();</span>
+    <span class="n">q</span><span class="o">.</span><span class="na">drainTo</span><span class="o">(</span><span class="n">taskList</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">q</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Runnable</span> <span class="n">r</span> <span class="o">:</span> <span class="n">q</span><span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="k">new</span> <span class="n">Runnable</span><span class="o">[</span><span class="mi">0</span><span class="o">]))</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">q</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">r</span><span class="o">))</span>
+                <span class="n">taskList</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">r</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">taskList</span><span class="o">;</span>
+<span class="o">}</span>
 
-/**
- * 预留方法，ScheduledThreadPoolExecutor重写了此方法
- */
-void onShutdown() {
-}
+<span class="cm">/**</span>
+<span class="cm"> * 预留方法，ScheduledThreadPoolExecutor重写了此方法</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="nf">onShutdown</span><span class="o">()</span> <span class="o">{</span>
+<span class="o">}</span>
 
-// ScheduledThreadPoolExecutor进行调用，判断是不是running或shutdown状态
-final boolean isRunningOrShutdown(boolean shutdownOK) {
-    int rs = runStateOf(ctl.get());
-    return rs == RUNNING || (rs == SHUTDOWN &amp;&amp; shutdownOK);
-}
+<span class="c1">// ScheduledThreadPoolExecutor进行调用，判断是不是running或shutdown状态</span>
+<span class="kd">final</span> <span class="kt">boolean</span> <span class="nf">isRunningOrShutdown</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">shutdownOK</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">rs</span> <span class="o">=</span> <span class="n">runStateOf</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+    <span class="k">return</span> <span class="n">rs</span> <span class="o">==</span> <span class="n">RUNNING</span> <span class="o">||</span> <span class="o">(</span><span class="n">rs</span> <span class="o">==</span> <span class="n">SHUTDOWN</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">shutdownOK</span><span class="o">);</span>
+<span class="o">}</span>
 
-// ScheduledThreadPoolExecutor进行调用，确认都提前准备好了
-void ensurePrestart() {
-    int wc = workerCountOf(ctl.get());
-    if (wc &lt; corePoolSize)
-        addWorker(null, true);
-    else if (wc == 0)
-        addWorker(null, false);
-}
-</code></pre>
+<span class="c1">// ScheduledThreadPoolExecutor进行调用，确认都提前准备好了</span>
+<span class="kt">void</span> <span class="nf">ensurePrestart</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">wc</span> <span class="o">=</span> <span class="n">workerCountOf</span><span class="o">(</span><span class="n">ctl</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">wc</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">corePoolSize</span><span class="o">)</span>
+        <span class="n">addWorker</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">wc</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+        <span class="n">addWorker</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <h2>4、线程池的监控</h2>
 

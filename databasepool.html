@@ -2,70 +2,81 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=yes"/>
-    <link href="/css/main.css" rel="stylesheet" type="text/css">
-    <link href="/css/codehighlight.css" rel="stylesheet" type="text/css">
+    <link href="./css/main.css" rel="stylesheet" type="text/css">
+    <link href="./css/manni.css" rel="stylesheet" type="text/css">
     <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
-    <link rel="shortcut icon" href="/images/zz.jpg">
+    <link rel="shortcut icon" href="./images/zz.jpg">
     <title></title>
 </head>
 <body>
+<div class="not_in_mm">
+    <div id="js_pc_qr_code" class="qr_code_pc_outer">
+        <div class="qr_code_pc_inner">
+            <div class="qr_code_pc_2">
+                <img class="qr_code_pc_img" src="./images/myclass.jpg">
+                <p>微信扫一扫<br>关注该公众号</p>
+            </div>
+        </div>
+    </div>
+</div>
   <div class="content">
   <h1>DBCP数据连接池</h1>
 
 <p>DBCP数据连接池参数介绍，相关配置，和DBCP是如何创建数据源，如何缓存和管理连接池的；最核心的部分，一个是连接池，第二个是连接，第三个则是连接池和连接的关系，在此表现为一对多的互相引用。</p>
 
-<pre><code>maxActive：一个时间最大的活跃连接数，负数代表没有上限
-maxIdle：池中最大的空闲对象保持数，其他的将会释放，负数代表没有上限
-minIdle：池中最小的空闲对象保持数，其他的将会被创建，0代表不保持
-maxWait：当池耗尽时等待空闲对象的最长时间
-maxWaitMillis：获取连接最大等待时间,-1代表一直等
-timeBetweenEvictionRunsMillis：空闲对象被清除的时间间隔
-poolPreparedStatements：Statement pool true时包含PreparedStatements和CallableStatements
-numTestsPerEvictionRun：每次运行清除空闲对象线程时要检查的对象数
-minEvictableIdleTimeMillis：空闲对象在可被清除之前的最小的停留时间
-testWhileIdle：指示对象是否由空闲对象（如果有的话）验证。 如果一个对象无法验证，它将从池中删除。默认false
-maxOpenPreparedStatements = GenericKeyedObjectPool.DEFAULT_MAX_TOTAL （-1）:
-最大开放语句数声明池。 一个连接通常每次只使用一个或两个语句，这是主要用于帮助检测资源泄漏
-removeAbandonedTimeout:超时多少秒删除连接
+<div class="highlight"><pre><span></span><span class="n">maxActive</span><span class="err">：</span><span class="n">一个时间最大的活跃连接数</span><span class="err">，</span><span class="n">负数代表没有上限</span>
+<span class="n">maxIdle</span><span class="err">：</span><span class="n">池中最大的空闲对象保持数</span><span class="err">，</span><span class="n">其他的将会释放</span><span class="err">，</span><span class="n">负数代表没有上限</span>
+<span class="n">minIdle</span><span class="err">：</span><span class="n">池中最小的空闲对象保持数</span><span class="err">，</span><span class="n">其他的将会被创建</span><span class="err">，</span><span class="mi">0</span><span class="n">代表不保持</span>
+<span class="n">maxWait</span><span class="err">：</span><span class="n">当池耗尽时等待空闲对象的最长时间</span>
+<span class="n">maxWaitMillis</span><span class="err">：</span><span class="n">获取连接最大等待时间</span><span class="o">,-</span><span class="mi">1</span><span class="n">代表一直等</span>
+<span class="n">timeBetweenEvictionRunsMillis</span><span class="err">：</span><span class="n">空闲对象被清除的时间间隔</span>
+<span class="n">poolPreparedStatements</span><span class="err">：</span><span class="n">Statement</span> <span class="n">pool</span> <span class="n">true时包含PreparedStatements和CallableStatements</span>
+<span class="n">numTestsPerEvictionRun</span><span class="err">：</span><span class="n">每次运行清除空闲对象线程时要检查的对象数</span>
+<span class="n">minEvictableIdleTimeMillis</span><span class="err">：</span><span class="n">空闲对象在可被清除之前的最小的停留时间</span>
+<span class="n">testWhileIdle</span><span class="err">：</span><span class="n">指示对象是否由空闲对象</span><span class="err">（</span><span class="n">如果有的话</span><span class="err">）</span><span class="n">验证</span><span class="err">。</span> <span class="n">如果一个对象无法验证</span><span class="err">，</span><span class="n">它将从池中删除</span><span class="err">。</span><span class="n">默认false</span>
+<span class="n">maxOpenPreparedStatements</span> <span class="o">=</span> <span class="n">GenericKeyedObjectPool</span><span class="o">.</span><span class="na">DEFAULT_MAX_TOTAL</span> <span class="err">（</span><span class="o">-</span><span class="mi">1</span><span class="err">）</span><span class="o">:</span>
+<span class="n">最大开放语句数声明池</span><span class="err">。</span> <span class="n">一个连接通常每次只使用一个或两个语句</span><span class="err">，</span><span class="n">这是主要用于帮助检测资源泄漏</span>
+<span class="nl">removeAbandonedTimeout:</span><span class="n">超时多少秒删除连接</span>
+</pre></div>
 
-</code></pre>
 
 <p>BasicDataSource配置：</p>
 
-<pre><code> &lt;!-- datasource setting --&gt;
-    &lt;bean id="basicDataSource" class="org.apache.commons.dbcp.BasicDataSource" abstract="true"
-          init-method="createDataSource"&gt;
-        &lt;property name="driverClassName" value="com.mysql.jdbc.Driver"/&gt;
-        &lt;!-- 一个时间最大的活跃连接数，负数代表没有上限 --&gt;
-        &lt;property name="maxActive" value="10"/&gt;
-        &lt;!-- 池中空闲对象的最大数量 --&gt;
-        &lt;property name="maxIdle" value="10"/&gt;
-        &lt;!-- 池中空闲对象的最小数量 --&gt;
-        &lt;property name="minIdle" value="5"/&gt;
-        &lt;!-- 当池耗尽时等待空闲对象的最长时间 --&gt;
-        &lt;property name="maxWait" value="3000"/&gt;
-        &lt;!-- 池启动时创建的初始连接数 --&gt;
-        &lt;property name="initialSize" value="20"/&gt;
-        &lt;!-- 空闲时间：空闲对象被清除的时间间隔--&gt;
-        &lt;property name="timeBetweenEvictionRunsMillis" value="60000"/&gt;
-        &lt;!-- Statement pool true时包含PreparedStatements和CallableStatements --&gt;
-        &lt;property name="poolPreparedStatements" value="true"/&gt;
-        &lt;!-- 最大开放语句数声明池 --&gt;
-        &lt;property name="maxOpenPreparedStatements" value="50"/&gt;
-        &lt;!-- 超时多少秒删除连接 --&gt;
-        &lt;property name="removeAbandonedTimeout" value="180"/&gt;
-        &lt;!-- 申请连接时执行validationQuery检测连接是否有效，配置为true会降低性能 --&gt;
-        &lt;property name="testOnBorrow" value="false"/&gt;
-        &lt;!-- 归还连接时执行validationQuery检测连接是否有效，配置为true会降低性能  --&gt;
-        &lt;property name="testOnReturn" value="false"/&gt;
-        &lt;!-- 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于
-             timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。  --&gt;
-        &lt;property name="testWhileIdle" value="true"/&gt;
-        &lt;!-- 用来检测连接是否有效的sql，要求是一个查询语句,如果validationQuery为
-             null，testOnBorrow、testOnReturn、testWhileIdle都不起其作用。 --&gt;
-        &lt;property name="validationQuery" value="select 1;"/&gt;
-    &lt;/bean&gt;
-</code></pre>
+<div class="highlight"><pre><span></span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">datasource</span> <span class="n">setting</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">bean</span> <span class="n">id</span><span class="o">=</span><span class="s">&quot;basicDataSource&quot;</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;org.apache.commons.dbcp.BasicDataSource&quot;</span> <span class="kd">abstract</span><span class="o">=</span><span class="s">&quot;true&quot;</span>
+          <span class="n">init</span><span class="o">-</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;createDataSource&quot;</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;driverClassName&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;com.mysql.jdbc.Driver&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">一个时间最大的活跃连接数</span><span class="err">，</span><span class="n">负数代表没有上限</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;maxActive&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;10&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">池中空闲对象的最大数量</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;maxIdle&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;10&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">池中空闲对象的最小数量</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;minIdle&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;5&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">当池耗尽时等待空闲对象的最长时间</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;maxWait&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;3000&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">池启动时创建的初始连接数</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;initialSize&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;20&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">空闲时间</span><span class="err">：</span><span class="n">空闲对象被清除的时间间隔</span><span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;timeBetweenEvictionRunsMillis&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;60000&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">Statement</span> <span class="n">pool</span> <span class="n">true时包含PreparedStatements和CallableStatements</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;poolPreparedStatements&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;true&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">最大开放语句数声明池</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;maxOpenPreparedStatements&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;50&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">超时多少秒删除连接</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;removeAbandonedTimeout&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;180&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">申请连接时执行validationQuery检测连接是否有效</span><span class="err">，</span><span class="n">配置为true会降低性能</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;testOnBorrow&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;false&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">归还连接时执行validationQuery检测连接是否有效</span><span class="err">，</span><span class="n">配置为true会降低性能</span>  <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;testOnReturn&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;false&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">建议配置为true</span><span class="err">，</span><span class="n">不影响性能</span><span class="err">，</span><span class="n">并且保证安全性</span><span class="err">。</span><span class="n">申请连接的时候检测</span><span class="err">，</span><span class="n">如果空闲时间大于</span>
+             <span class="n">timeBetweenEvictionRunsMillis</span><span class="err">，</span><span class="n">执行validationQuery检测连接是否有效</span><span class="err">。</span>  <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;testWhileIdle&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;true&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;!--</span> <span class="n">用来检测连接是否有效的sql</span><span class="err">，</span><span class="n">要求是一个查询语句</span><span class="o">,</span><span class="n">如果validationQuery为</span>
+             <span class="kc">null</span><span class="err">，</span><span class="n">testOnBorrow</span><span class="err">、</span><span class="n">testOnReturn</span><span class="err">、</span><span class="n">testWhileIdle都不起其作用</span><span class="err">。</span> <span class="o">--&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;validationQuery&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;select 1;&quot;</span><span class="o">/&amp;</span><span class="n">gt</span><span class="o">;</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;/</span><span class="n">bean</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span>
+</pre></div>
+
 
 <p>自动检查连接的可用性，dbcp定时检测连接，dbcp自动重连的配置说明：
 maxIdle值与maxActive值应配置的接近。
@@ -86,175 +97,182 @@ initialSize="5"，会在tomcat一启动时，创建5条连接，效果很理想�
     minEvictableIdleTimeMillis = "1800000"  池中的连接空闲30分钟后被回收,默认值就是30分钟。
     numTestsPerEvictionRun="3" 在每次空闲连接回收器线程(如果有)运行时检查的连接数量，默认值就是3.</p>
 
-<pre><code>解释：
-配置timeBetweenEvictionRunsMillis = "30000"后，每30秒运行一次空闲连接回收器（独立线程）。并每次检查3个连接，如果连接空闲时间超过30分钟就销毁。销毁连接后，连接数量就少了，如果小于minIdle数量，就新建连接，维护数量不少于minIdle，过行了新老更替。
-testWhileIdle = "true" 表示每30秒，取出3条连接，使用validationQuery = "SELECT 1" 中的SQL进行测试 ，测试不成功就销毁连接。销毁连接后，连接数量就少了，如果小于minIdle数量，就新建连接。
-testOnBorrow = "false" 一定要配置，因为它的默认值是true。false表示每次从连接池中取出连接时，不需要执行validationQuery = "SELECT 1" 中的SQL进行测试。若配置为true,对性能有非常大的影响，性能会下降7-10倍。所在一定要配置为false.
-每30秒，取出numTestsPerEvictionRun条连接（本例是3，也是默认值），发出"SELECT 1" SQL语句进行测试 ，测试过的连接不算是“被使用”了，还算是空闲的。连接空闲30分钟后会被销毁。
-</code></pre>
+<div class="highlight"><pre><span></span><span class="n">解释</span><span class="err">：</span>
+<span class="n">配置timeBetweenEvictionRunsMillis</span> <span class="o">=</span> <span class="s">&quot;30000&quot;</span><span class="n">后</span><span class="err">，</span><span class="n">每30秒运行一次空闲连接回收器</span><span class="err">（</span><span class="n">独立线程</span><span class="err">）。</span><span class="n">并每次检查3个连接</span><span class="err">，</span><span class="n">如果连接空闲时间超过30分钟就销毁</span><span class="err">。</span><span class="n">销毁连接后</span><span class="err">，</span><span class="n">连接数量就少了</span><span class="err">，</span><span class="n">如果小于minIdle数量</span><span class="err">，</span><span class="n">就新建连接</span><span class="err">，</span><span class="n">维护数量不少于minIdle</span><span class="err">，</span><span class="n">过行了新老更替</span><span class="err">。</span>
+<span class="n">testWhileIdle</span> <span class="o">=</span> <span class="s">&quot;true&quot;</span> <span class="n">表示每30秒</span><span class="err">，</span><span class="n">取出3条连接</span><span class="err">，</span><span class="n">使用validationQuery</span> <span class="o">=</span> <span class="s">&quot;SELECT 1&quot;</span> <span class="n">中的SQL进行测试</span> <span class="err">，</span><span class="n">测试不成功就销毁连接</span><span class="err">。</span><span class="n">销毁连接后</span><span class="err">，</span><span class="n">连接数量就少了</span><span class="err">，</span><span class="n">如果小于minIdle数量</span><span class="err">，</span><span class="n">就新建连接</span><span class="err">。</span>
+<span class="n">testOnBorrow</span> <span class="o">=</span> <span class="s">&quot;false&quot;</span> <span class="n">一定要配置</span><span class="err">，</span><span class="n">因为它的默认值是true</span><span class="err">。</span><span class="n">false表示每次从连接池中取出连接时</span><span class="err">，</span><span class="n">不需要执行validationQuery</span> <span class="o">=</span> <span class="s">&quot;SELECT 1&quot;</span> <span class="n">中的SQL进行测试</span><span class="err">。</span><span class="n">若配置为true</span><span class="o">,</span><span class="n">对性能有非常大的影响</span><span class="err">，</span><span class="n">性能会下降7</span><span class="o">-</span><span class="mi">10</span><span class="n">倍</span><span class="err">。</span><span class="n">所在一定要配置为false</span><span class="o">.</span>
+<span class="n">每30秒</span><span class="err">，</span><span class="n">取出numTestsPerEvictionRun条连接</span><span class="err">（</span><span class="n">本例是3</span><span class="err">，</span><span class="n">也是默认值</span><span class="err">），</span><span class="n">发出</span><span class="s">&quot;SELECT 1&quot;</span> <span class="n">SQL语句进行测试</span> <span class="err">，</span><span class="n">测试过的连接不算是</span><span class="err">“</span><span class="n">被使用</span><span class="err">”</span><span class="n">了</span><span class="err">，</span><span class="n">还算是空闲的</span><span class="err">。</span><span class="n">连接空闲30分钟后会被销毁</span><span class="err">。</span>
+</pre></div>
+
 
 <h2>1、创建数据源：createDataSource</h2>
 
-<pre><code>a.创建drive工厂：createConnectionFactory
-b.创建GenericObjectPool connectionPool;
-c.statementPoolFactory:GenericKeyedObjectPoolFactory
-d.创建DataSource实例:
-PoolingDataSource pds = new PoolingDataSource(connectionPool);
-</code></pre>
+<div class="highlight"><pre><span></span><span class="n">a</span><span class="o">.</span><span class="na">创建drive工厂</span><span class="err">：</span><span class="n">createConnectionFactory</span>
+<span class="n">b</span><span class="o">.</span><span class="na">创建GenericObjectPool</span> <span class="n">connectionPool</span><span class="o">;</span>
+<span class="n">c</span><span class="o">.</span><span class="na">statementPoolFactory</span><span class="o">:</span><span class="n">GenericKeyedObjectPoolFactory</span>
+<span class="n">d</span><span class="o">.</span><span class="na">创建DataSource实例</span><span class="o">:</span>
+<span class="n">PoolingDataSource</span> <span class="n">pds</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PoolingDataSource</span><span class="o">(</span><span class="n">connectionPool</span><span class="o">);</span>
+</pre></div>
 
-<pre><code>//创建数据源
-protected synchronized DataSource createDataSource()
-        throws SQLException {
-        //如果closed标识为关闭，直接抛异常
-        if (closed) {
-            throw new SQLException("Data source is closed");
-        }
-        //不为空，直接返回
-        if (dataSource != null) {
-            return (dataSource);
-        }
 
-        // 创建返回driver原始物理连接的工厂，使用数据库驱动来创建最底层的JDBC连接
-        ConnectionFactory driverConnectionFactory = createConnectionFactory();
+<div class="highlight"><pre><span></span><span class="c1">//创建数据源</span>
+<span class="kd">protected</span> <span class="kd">synchronized</span> <span class="n">DataSource</span> <span class="nf">createDataSource</span><span class="o">()</span>
+        <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+        <span class="c1">//如果closed标识为关闭，直接抛异常</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">closed</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SQLException</span><span class="o">(</span><span class="s">&quot;Data source is closed&quot;</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="c1">//不为空，直接返回</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">dataSource</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="o">(</span><span class="n">dataSource</span><span class="o">);</span>
+        <span class="o">}</span>
 
-        // 为我们的连接创建一个池，缓存JDBC连接
-        createConnectionPool();
+        <span class="c1">// 创建返回driver原始物理连接的工厂，使用数据库驱动来创建最底层的JDBC连接</span>
+        <span class="n">ConnectionFactory</span> <span class="n">driverConnectionFactory</span> <span class="o">=</span> <span class="n">createConnectionFactory</span><span class="o">();</span>
 
-        // 设置statement pool，如果需要就设置statement的缓存池，这个一般不需要设置
-        工厂创建的池使用KeyedPoolableObjectFactory。
-              * @param maxActive一次可以从池中借用的最大对象数量。
-              * @param whenExhaustedAction在池耗尽时采取的操作。
-              * @param maxWait当池耗尽时等待空闲对象的最长时间。
-              * @param maxIdle池中空闲对象的最大数量。
-              * @param maxTotal一次可以存在的最大对象数量。
-        GenericKeyedObjectPoolFactory statementPoolFactory = null;
-        if (isPoolPreparedStatements()) {
-            statementPoolFactory = new GenericKeyedObjectPoolFactory(null,
-                        -1, // unlimited maxActive (per key)
-                        GenericKeyedObjectPool.WHEN_EXHAUSTED_FAIL,
-                        0, // maxWait：当池耗尽时等待空闲对象的最长时间
-                        1, // maxIdle (per key)：池中空闲对象的最大数量。
-                        maxOpenPreparedStatements);
-        }
+        <span class="c1">// 为我们的连接创建一个池，缓存JDBC连接</span>
+        <span class="n">createConnectionPool</span><span class="o">();</span>
 
-        /**
-         * 创建连接池工厂
-         * 这个工厂使用上述driverConnectionFactory来创建底层JDBC连接，然后包装出一个PoolableConnection，
-         * 这个PoolableConnection与连接池设置了一对多的关系，也就是说，连接池中存在多个PoolableConnection，
-         * 每个PoolableConnection都关联同一个连接池，这样的好处是便于该表PoolableConnection的close方法的行为，具体会在后面详细分析。
-            并将PoolableConnectionFactory赋值到连接池GenericObjectPool：_pool.setFactory(this);
-            后面就可以进行调addObject()
-         */
-        createPoolableConnectionFactory(driverConnectionFactory, statementPoolFactory, abandonedConfig);
+        <span class="c1">// 设置statement pool，如果需要就设置statement的缓存池，这个一般不需要设置</span>
+        <span class="n">工厂创建的池使用KeyedPoolableObjectFactory</span><span class="err">。</span>
+              <span class="o">*</span> <span class="nd">@param</span> <span class="n">maxActive一次可以从池中借用的最大对象数量</span><span class="err">。</span>
+              <span class="o">*</span> <span class="nd">@param</span> <span class="n">whenExhaustedAction在池耗尽时采取的操作</span><span class="err">。</span>
+              <span class="o">*</span> <span class="nd">@param</span> <span class="n">maxWait当池耗尽时等待空闲对象的最长时间</span><span class="err">。</span>
+              <span class="o">*</span> <span class="nd">@param</span> <span class="n">maxIdle池中空闲对象的最大数量</span><span class="err">。</span>
+              <span class="o">*</span> <span class="nd">@param</span> <span class="n">maxTotal一次可以存在的最大对象数量</span><span class="err">。</span>
+        <span class="n">GenericKeyedObjectPoolFactory</span> <span class="n">statementPoolFactory</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">isPoolPreparedStatements</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">statementPoolFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GenericKeyedObjectPoolFactory</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="o">,</span> <span class="c1">// unlimited maxActive (per key)</span>
+                        <span class="n">GenericKeyedObjectPool</span><span class="o">.</span><span class="na">WHEN_EXHAUSTED_FAIL</span><span class="o">,</span>
+                        <span class="mi">0</span><span class="o">,</span> <span class="c1">// maxWait：当池耗尽时等待空闲对象的最长时间</span>
+                        <span class="mi">1</span><span class="o">,</span> <span class="c1">// maxIdle (per key)：池中空闲对象的最大数量。</span>
+                        <span class="n">maxOpenPreparedStatements</span><span class="o">);</span>
+        <span class="o">}</span>
 
-        // 创建并返回数据源管理实例
-        createDataSourceInstance();
+        <span class="cm">/**</span>
+<span class="cm">         * 创建连接池工厂</span>
+<span class="cm">         * 这个工厂使用上述driverConnectionFactory来创建底层JDBC连接，然后包装出一个PoolableConnection，</span>
+<span class="cm">         * 这个PoolableConnection与连接池设置了一对多的关系，也就是说，连接池中存在多个PoolableConnection，</span>
+<span class="cm">         * 每个PoolableConnection都关联同一个连接池，这样的好处是便于该表PoolableConnection的close方法的行为，具体会在后面详细分析。</span>
+<span class="cm">            并将PoolableConnectionFactory赋值到连接池GenericObjectPool：_pool.setFactory(this);</span>
+<span class="cm">            后面就可以进行调addObject()</span>
+<span class="cm">         */</span>
+        <span class="n">createPoolableConnectionFactory</span><span class="o">(</span><span class="n">driverConnectionFactory</span><span class="o">,</span> <span class="n">statementPoolFactory</span><span class="o">,</span> <span class="n">abandonedConfig</span><span class="o">);</span>
 
-        // 初始化 为连接池中添加PoolableConnection
-        try {
-            for (int i = 0 ; i &lt; initialSize ; i++) {
-                connectionPool.addObject();
-            }
-        } catch (Exception e) {
-            throw new SQLNestedException("Error preloading the connection pool", e);
-        }
+        <span class="c1">// 创建并返回数据源管理实例</span>
+        <span class="n">createDataSourceInstance</span><span class="o">();</span>
 
-        return dataSource;
-    }
-</code></pre>
+        <span class="c1">// 初始化 为连接池中添加PoolableConnection</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">initialSize</span> <span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+                <span class="n">connectionPool</span><span class="o">.</span><span class="na">addObject</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SQLNestedException</span><span class="o">(</span><span class="s">&quot;Error preloading the connection pool&quot;</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="n">dataSource</span><span class="o">;</span>
+    <span class="o">}</span>
+</pre></div>
+
 
 <p>初始化添加连接：</p>
 
-<pre><code> public void addObject() throws Exception {
-        assertOpen();
-        if (_factory == null) {
-            throw new IllegalStateException("Cannot add objects without a factory.");
-        }
-        Object obj = _factory.makeObject();
-        try {
-            assertOpen();
-            addObjectToPool(obj, false);
-        } catch (IllegalStateException ex) { // Pool closed
-            try {
-                _factory.destroyObject(obj);
-            } catch (Exception ex2) {
-                // swallow
-            }
-            throw ex;
-        }
-    }
+<div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kt">void</span> <span class="nf">addObject</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">assertOpen</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">_factory</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalStateException</span><span class="o">(</span><span class="s">&quot;Cannot add objects without a factory.&quot;</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">Object</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">_factory</span><span class="o">.</span><span class="na">makeObject</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">assertOpen</span><span class="o">();</span>
+            <span class="n">addObjectToPool</span><span class="o">(</span><span class="n">obj</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IllegalStateException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// Pool closed</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">_factory</span><span class="o">.</span><span class="na">destroyObject</span><span class="o">(</span><span class="n">obj</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex2</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// swallow</span>
+            <span class="o">}</span>
+            <span class="k">throw</span> <span class="n">ex</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    public Object makeObject() throws Exception {
-            Connection conn = _connFactory.createConnection();
-            if (conn == null) {
-                throw new IllegalStateException("Connection factory returned null from createConnection");
-            }
-            initializeConnection(conn);
-            if(null != _stmtPoolFactory) {
-                KeyedObjectPool stmtpool = _stmtPoolFactory.createPool();
-                conn = new PoolingConnection(conn,stmtpool);
-                stmtpool.setFactory((PoolingConnection)conn);
-            }
-            return new PoolableConnection(conn,_pool,_config);
-        }
-</code></pre>
+    <span class="kd">public</span> <span class="n">Object</span> <span class="nf">makeObject</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+            <span class="n">Connection</span> <span class="n">conn</span> <span class="o">=</span> <span class="n">_connFactory</span><span class="o">.</span><span class="na">createConnection</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">conn</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalStateException</span><span class="o">(</span><span class="s">&quot;Connection factory returned null from createConnection&quot;</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="n">initializeConnection</span><span class="o">(</span><span class="n">conn</span><span class="o">);</span>
+            <span class="k">if</span><span class="o">(</span><span class="kc">null</span> <span class="o">!=</span> <span class="n">_stmtPoolFactory</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">KeyedObjectPool</span> <span class="n">stmtpool</span> <span class="o">=</span> <span class="n">_stmtPoolFactory</span><span class="o">.</span><span class="na">createPool</span><span class="o">();</span>
+                <span class="n">conn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PoolingConnection</span><span class="o">(</span><span class="n">conn</span><span class="o">,</span><span class="n">stmtpool</span><span class="o">);</span>
+                <span class="n">stmtpool</span><span class="o">.</span><span class="na">setFactory</span><span class="o">((</span><span class="n">PoolingConnection</span><span class="o">)</span><span class="n">conn</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="n">PoolableConnection</span><span class="o">(</span><span class="n">conn</span><span class="o">,</span><span class="n">_pool</span><span class="o">,</span><span class="n">_config</span><span class="o">);</span>
+        <span class="o">}</span>
+</pre></div>
+
 
 <p>保存链接的数据结构：CursorableLinkedList _pool</p>
 
-<pre><code>   synchronized (this) {
-               if (isClosed()) {
-                   shouldDestroy = true;
-               } else {
-                   if((_maxIdle &gt;= 0) &amp;&amp; (_pool.size() &gt;= _maxIdle)) {
-                       shouldDestroy = true;
-                   } else if(success) {
-                       // borrowObject always takes the first element from the queue,
-                       // so for LIFO, push on top, FIFO add to end
-                       if (_lifo) {
-                           _pool.addFirst(new ObjectTimestampPair(obj));
-                       } else {
-                           _pool.addLast(new ObjectTimestampPair(obj));
-                       }
-                       if (decrementNumActive) {
-                           _numActive--;
-                       }
-                       allocate();
-                   }
-               }
-           }
+<div class="highlight"><pre><span></span><span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+               <span class="k">if</span> <span class="o">(</span><span class="n">isClosed</span><span class="o">())</span> <span class="o">{</span>
+                   <span class="n">shouldDestroy</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+               <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                   <span class="k">if</span><span class="o">((</span><span class="n">_maxIdle</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="o">(</span><span class="n">_pool</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="n">_maxIdle</span><span class="o">))</span> <span class="o">{</span>
+                       <span class="n">shouldDestroy</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                   <span class="o">}</span> <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="n">success</span><span class="o">)</span> <span class="o">{</span>
+                       <span class="c1">// borrowObject always takes the first element from the queue,</span>
+                       <span class="c1">// so for LIFO, push on top, FIFO add to end</span>
+                       <span class="k">if</span> <span class="o">(</span><span class="n">_lifo</span><span class="o">)</span> <span class="o">{</span>
+                           <span class="n">_pool</span><span class="o">.</span><span class="na">addFirst</span><span class="o">(</span><span class="k">new</span> <span class="n">ObjectTimestampPair</span><span class="o">(</span><span class="n">obj</span><span class="o">));</span>
+                       <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                           <span class="n">_pool</span><span class="o">.</span><span class="na">addLast</span><span class="o">(</span><span class="k">new</span> <span class="n">ObjectTimestampPair</span><span class="o">(</span><span class="n">obj</span><span class="o">));</span>
+                       <span class="o">}</span>
+                       <span class="k">if</span> <span class="o">(</span><span class="n">decrementNumActive</span><span class="o">)</span> <span class="o">{</span>
+                           <span class="n">_numActive</span><span class="o">--;</span>
+                       <span class="o">}</span>
+                       <span class="n">allocate</span><span class="o">();</span>
+                   <span class="o">}</span>
+               <span class="o">}</span>
+           <span class="o">}</span>
+</pre></div>
 
-</code></pre>
 
 <h2>二、使用DataSource获取连接：PoolingDataSource</h2>
 
-<pre><code>public Connection getConnection() throws SQLException {
-        try {
-            Connection conn = (Connection)(_pool.borrowObject());
-            if (conn != null) {
-                conn = new PoolGuardConnectionWrapper(conn);
-            }
-            return conn;
-        } catch(SQLException e) {
-            throw e;
-        } catch(NoSuchElementException e) {
-            throw new SQLNestedException("Cannot get a connection, pool error " + e.getMessage(), e);
-        } catch(RuntimeException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new SQLNestedException("Cannot get a connection, general error", e);
-        }
-    }
-</code></pre>
+<div class="highlight"><pre><span></span><span class="kd">public</span> <span class="n">Connection</span> <span class="nf">getConnection</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">Connection</span> <span class="n">conn</span> <span class="o">=</span> <span class="o">(</span><span class="n">Connection</span><span class="o">)(</span><span class="n">_pool</span><span class="o">.</span><span class="na">borrowObject</span><span class="o">());</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">conn</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">conn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PoolGuardConnectionWrapper</span><span class="o">(</span><span class="n">conn</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="k">return</span> <span class="n">conn</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">NoSuchElementException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SQLNestedException</span><span class="o">(</span><span class="s">&quot;Cannot get a connection, pool error &quot;</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">RuntimeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SQLNestedException</span><span class="o">(</span><span class="s">&quot;Cannot get a connection, general error&quot;</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+</pre></div>
+
 
 <p>borrowObject方法：</p>
 
-<pre><code>
-</code></pre>
+<div class="highlight"><pre><span></span>
+</pre></div>
+
 
 <h2>三、连接池：</h2>
 
-<pre><code>protected volatile GenericObjectPool connectionPool = null;
-</code></pre>
+<div class="highlight"><pre><span></span><span class="kd">protected</span> <span class="kd">volatile</span> <span class="n">GenericObjectPool</span> <span class="n">connectionPool</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</pre></div>
+
 
 <p>apache的common-pool工具库中有5种对象池:GenericObjectPool和GenericKeyedObjectPool,
 SoftReferenceObjectPool, StackObjectPool, StackKeyedObjectPool.

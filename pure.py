@@ -1,10 +1,21 @@
 #!/usr/bin/env python
+#coding=utf-8
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 import os
 import re
 import shutil
+import io
 from os.path import join, dirname, basename as filename, splitext
-from urllib.request import pathname2url
+from urllib import pathname2url
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
 
 import markdown2
 from jinja2 import PackageLoader, Environment
@@ -22,20 +33,29 @@ class Post(object):
         self._title = None
         self._image = None
         self._abstract = None
+        self.lexer = get_lexer_by_name("java", stripall=True)
+        self.formatter = HtmlFormatter()
 
     @property
     def html(self):
         if not self._html:
-            with open(self.fromfile,'r',encoding='UTF-8') as f:
+            with io.open(self.fromfile,'r',encoding='UTF-8') as f:
                 self._html = markdown2.markdown(f.read(),extras=['fenced-code-blocks', 'footnotes'])
+                codearray = re.findall("<code>(.*?)</code>", self.html,re.S)
+                for zzvar in codearray:
+                    newcode = highlight(zzvar, self.lexer, self.formatter)
+                    #print ("zzzzzzzzzzzzz:"+newcode)
+                    self._html = self._html.replace("<pre><code>"+zzvar+"</code></pre>",newcode);
+
                 c = re.compile("<p>(\\n)+</p>")
                 self._html = re.sub(c, '</br>', self._html)
+                #print("self._html:"+self._html)
         return self._html
 
     @property
     def abstract(self):
         if not self._abstract:
-             abstract = re.findall("<p>(.*?)</p>", self.html)
+             abstract = re.findall("<p>(.*?)</p>", self.html,re.S)
              self._abstract = abstract[0] if abstract else filename(self.destfile).rsplit(".")[0]
              print("self._abstract:"+self._abstract)
         return self._abstract
@@ -58,7 +78,7 @@ class Post(object):
     def write(self):
         if not os.path.exists(dirname(self.destfile)):
             os.makedirs(dirname(self.destfile))
-        with open(self.destfile, "w", encoding="utf-8", errors="xmlcharrefreplace") as fd:
+        with io.open(self.destfile, "w", encoding="utf-8") as fd:
             html = jinja_env.get_template("post.html").render(title=self.title, content=self.html)
             # print(html)
             fd.write(html)
@@ -68,7 +88,7 @@ def all_post_file():
     postlist = []
     for root, dirs, files in os.walk(post_basedir):
         for f_name in files:
-            # 设置忽略格式
+            #设置忽略格式
             if f_name.startswith(".") or f_name.endswith(("pdf",)): continue
             post_path = join(root, f_name)
             c_time = os.stat(post_path).st_ctime
@@ -85,7 +105,7 @@ def cover_all_post():
         print("--------"+p.title, p.url, p.image, p.abstract)
         postlist.append(p)
     index_t = jinja_env.get_template("index.html")
-    with open(join(website_dir, "index.html"), "w",encoding='UTF-8') as fd:
+    with io.open(join(website_dir, "index.html"), "w",encoding='UTF-8') as fd:
         fd.write(index_t.render(postlist=postlist))
 
 
@@ -117,12 +137,16 @@ root_dir = dirname(__file__)
 jinja_env = Environment(loader=PackageLoader(__name__))
 
 # 文件输出地址,确定已经git init,可以直接git push origin master
-website_dir = "D:\\User\\zhangzuigit\\zhangzui.github.io"
-website_dir_html = "D:\\User\\zhangzuigit\\zhangzui.github.io\\html"
-website_dir_css = "D:\\User\\zhangzuigit\\zhangzui.github.io\\css"
+#website_dir = "D:\\User\\zhangzuigit\\zhangzui.github.io"
+#website_dir_html = "D:\\User\\zhangzuigit\\zhangzui.github.io\\html"
+#website_dir_css = "D:\\User\\zhangzuigit\\zhangzui.github.io\\css"
+
+website_dir = "/usr/zzone/zzgit/zhangzui.github.io"
+website_dir_html = "/usr/zzone/zzgit/zhangzui.github.io/html"
+website_dir_css = "/usr/zzone/zzgit/zhangzui.github.io/css"
 
 # 博客名字
-jinja_env.globals["title"] = "Myclass社区博客"
+jinja_env.globals["title"] = "Myclass社区"
 
 # 博客图标
 jinja_env.globals["icon"] = "zz.jpg"

@@ -6,56 +6,55 @@ html {
 
 body {
     font-family: "lucida grande", "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
-    font-size: 18px;
+    font-size: 15px;
     margin: auto;
-    margin-top: 5%;
-    padding: 2% 5%;
-    width: 80%;
+    #margin-top: 20px;
+    #padding: 2% 5%;
+    width: 90%;
     line-height: 200%;
-    border: 1px solid LightGrey;
+    #border: 1px solid LightGrey;
 }
 
 @media(min-width:992px){
   body {
       margin: auto;
-      margin-top: 5%;
-      width: 40%;
+      margin-top: 2%;
+      width: 50%;
   }
 }
 
 H1 {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti, SimSun, serif;
+    color: #159957;
 }
 
 H2 {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti, SimSun, serif;
-    margin-bottom: 60px;
     margin-bottom: 40px;
+    margin-bottom: 20px;
     padding: 5px;
-    border-bottom: 2px LightGrey solid;
+   #border-bottom: 2px LightGrey solid;
     width: 98%;
     line-height: 150%;
-    color: #666666;
+    color: #159957;
 }
 
 H3 {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti, SimSun, serif;
-    margin-top: 40px;
-    margin-bottom: 30px;
-    border-bottom: 1px LightGrey solid;
+    margin-top: 30px;
     width: 98%;
     line-height: 150%;
-    color: #666666;
+    color: #159957;
 }
 
 H4 {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti, SimSun, serif;
-    margin-top: 40px;
-    margin-bottom: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     border-bottom: 1px LightGrey solid;
     width: 98%;
     line-height: 150%;
-    color: #666666;
+    color: #159957;
 }
 
 li {
@@ -74,14 +73,11 @@ pre {
     font-family: Inconsolata, Consolas, "DEJA VU SANS MONO", "DROID SANS MONO", Proggy, monospace;
     font-size: 90%;
     border: solid 1px lightgrey;
-    background-color: Ivory;
     padding: 5px;
     line-height: 130%;
-    margin-left: auto;
-    margin-right: auto;
-    width: 90%;
     overflow-wrap: break-word;
     overflow: auto;
+    background-color: Ivory;
 }
 
 code {
@@ -151,3 +147,65 @@ div.tweet i {
     margin-right: 0.5em;
     padding: 0px 2px;
 }
+
+.not_in_mm .qr_code_pc_img {
+            width: 102px;
+            height: 102px;
+        }
+        .not_in_mm .qr_code_pc {
+            position: absolute;
+            right: -150px;
+            top: 50px;
+            width: 150px;
+            padding: 16px;
+            border: 1px solid #d9dadc;
+            background-color: #fff;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+        .not_in_mm .qr_code_pc_1 {
+            position: absolute;
+            right: 740px;
+            top: 50px;
+            width: 150px;
+            padding: 16px;
+            border: 1px solid #d9dadc;
+            background-color: #fff;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+        .not_in_mm .qr_code_pc_2 {
+            position: absolute;
+            right: -280px;
+            top: 50px;
+            width: 150px;
+            padding: 16px;
+            border: 1px solid #d9dadc;
+            background-color: #fff;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+        .not_in_mm .qr_code_pc_inner {
+            position: relative;
+            width: 740px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .not_in_mm .qr_code_pc_outer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 20px;
+            color: #717375;
+            text-align: center;
+        }
+        p {
+            display: block;
+            -webkit-margin-before: 1em;
+            -webkit-margin-after: 1em;
+            -webkit-margin-start: 0px;
+            -webkit-margin-end: 0px;
+        }
+        .myclass_style{
+            color: #a78918;
+        }

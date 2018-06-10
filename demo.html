@@ -1,9 +1,80 @@
-# my-sharding-jdbc
-ShardingJDBC001简单的例子，配置信息的初始化,以及源码解析
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=yes"/>
+    <link href="./css/main.css" rel="stylesheet" type="text/css">
+    <link href="./css/manni.css" rel="stylesheet" type="text/css">
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
+    <link rel="shortcut icon" href="./images/zz.jpg">
+    <title></title>
+    <style>
+  .rich_media_title {
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid #e7e7eb;
+}
+    </style>
+</head>
+<body>
+<div class="not_in_mm">
+    <div id="js_pc_qr_code" class="qr_code_pc_outer">
+        <div class="qr_code_pc_inner">
+            <div class="qr_code_pc">
+                <img class="qr_code_pc_img" src="./images/myclass.jpg">
+                <p>微信扫一扫<br>关注该公众号</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-## 使用示例
-ShardingJDBC
-```
+  <div class="content">
+  <h1 class="rich_media_title">my-sharding-jdbc简介</h1>
+<p>ShardingJDBC001简单的例子，配置信息的初始化,以及源码解析</p>
+
+<h2>使用示例</h2>
+
+<p>ShardingJDBC</p>
+
+      <div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">zz</span><span class="o">.</span><span class="n">com</span><span class="o">.</span><span class="n">dp</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">jbase</span><span class="o">.</span><span class="n">zz_threadpool</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.concurrent.RejectedExecutionHandler</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.concurrent.ThreadPoolExecutor</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.concurrent.atomic.AtomicInteger</span><span class="p">;</span>
+
+<span class="o">/**</span>
+ <span class="o">*</span> <span class="nd">@author</span> <span class="n">zhangzuizui</span>
+ <span class="o">*</span> <span class="nd">@date</span> <span class="mi">2018</span><span class="o">/</span><span class="mi">6</span><span class="o">/</span><span class="mi">5</span> <span class="mi">10</span><span class="p">:</span><span class="mi">51</span>
+ <span class="o">*/</span>
+<span class="n">public</span> <span class="k">class</span> <span class="nc">MyRejectedHandler</span> <span class="n">implements</span> <span class="n">RejectedExecutionHandler</span> <span class="p">{</span>
+
+    <span class="n">private</span> <span class="n">volatile</span> <span class="n">AtomicInteger</span> <span class="n">rejectedCount</span> <span class="o">=</span> <span class="n">new</span> <span class="n">AtomicInteger</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+    <span class="n">public</span> <span class="n">MyRejectedHandler</span><span class="p">()</span> <span class="p">{</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">void</span> <span class="n">rejectedExecution</span><span class="p">(</span><span class="n">Runnable</span> <span class="n">r</span><span class="p">,</span> <span class="n">ThreadPoolExecutor</span> <span class="n">executor</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="err">!</span><span class="n">executor</span><span class="o">.</span><span class="n">isShutdown</span><span class="p">())</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;命中拒绝策略：rejectedCount.getAndIncrement()&quot;</span><span class="p">);</span>
+            <span class="n">rejectedCount</span><span class="o">.</span><span class="n">getAndIncrement</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">AtomicInteger</span> <span class="n">getRejectedCount</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">rejectedCount</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">void</span> <span class="n">setRejectedCount</span><span class="p">(</span><span class="n">AtomicInteger</span> <span class="n">rejectedCount</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">rejectedCount</span> <span class="o">=</span> <span class="n">rejectedCount</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">HtmlFormatter</span><span class="p">(</span><span class="n">linenos</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">cssclass</span><span class="o">=</span><span class="s2">&quot;source&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_style_defs</span><span class="p">(</span><span class="s1">&#39;.highlight&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">highlight</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">PythonLexer</span><span class="p">(),</span> <span class="n">HtmlFormatter</span><span class="p">())</span>
+</pre></div>
+
+      <pre>
+<code>
 package com.zz.sharding.jdbc.test;
 
 import io.shardingjdbc.core.api.ShardingDataSourceFactory;
@@ -32,7 +103,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ShardingJDBC001 {
 
     public static void main(String[] args) throws SQLException {
-        Map<String, DataSource> dataSourceMap = new HashMap<>();
+        Map&lt;String, DataSource&gt; dataSourceMap = new HashMap&lt;&gt;();
         // 配置第一个数据源
         dataSourceMap.put("my_shard_01",createDataSource("my_shard_01"));
 
@@ -91,20 +162,22 @@ public class ShardingJDBC001 {
         return result;
     }
 }
-```
-##一、构建ShardingDataSource数据源：初始化配置信息
-```
-DataSource dataSource = ShardingDataSourceFactory.createDataSource()
-```
-###详细
-```
-1.public static DataSource createDataSource(final Map<String, DataSource> dataSourceMap, final ShardingRuleConfiguration shardingRuleConfig,
-                                              final Map<String, Object> configMap, final Properties props) throws SQLException {
+</code></pre>
+
+<h2>一、构建ShardingDataSource数据源：初始化配置信息</h2>
+
+<pre><code>DataSource dataSource = ShardingDataSourceFactory.createDataSource()
+</code></pre>
+
+<h3>详细</h3>
+
+<pre><code>1.public static DataSource createDataSource(final Map&lt;String, DataSource&gt; dataSourceMap, final ShardingRuleConfiguration shardingRuleConfig,
+                                              final Map&lt;String, Object&gt; configMap, final Properties props) throws SQLException {
         return new ShardingDataSource(shardingRuleConfig.build(dataSourceMap), configMap, props);
     }
 其中shardingRuleConfig.build(dataSourceMap)构建分库和分表的规则配置
 
-2.public ShardingDataSource(final ShardingRule shardingRule, final Map<String, Object> configMap, final Properties props) throws SQLException {
+2.public ShardingDataSource(final ShardingRule shardingRule, final Map&lt;String, Object&gt; configMap, final Properties props) throws SQLException {
         super(shardingRule.getDataSourceMap().values());
         if (!configMap.isEmpty()) {
             ConfigMapContext.getInstance().getShardingConfig().putAll(configMap);
@@ -116,15 +189,17 @@ DataSource dataSource = ShardingDataSourceFactory.createDataSource()
         shardingContext = new ShardingContext(shardingRule, getDatabaseType(), executorEngine, showSQL);
     }
 3.初始化ShardingContext
-```
-二、获取数据库连接
-```
-Connection conn = dataSource.getConnection();
+</code></pre>
+
+<p>二、获取数据库连接</p>
+
+<pre><code>Connection conn = dataSource.getConnection();
 new ShardingConnection(shardingContext);
-```
-三、sql预处理
-```
-PreparedStatement pstmt = conn.prepareStatement(sql);
+</code></pre>
+
+<p>三、sql预处理</p>
+
+<pre><code>PreparedStatement pstmt = conn.prepareStatement(sql);
 
 1.初始化sql预处理器：ShardingPreparedStatement
 public ShardingPreparedStatement(final ShardingConnection connection, final String sql, final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability) {
@@ -143,15 +218,16 @@ public static SQLRouter createSQLRouter(final ShardingContext shardingContext) {
  提示sqlRouter:DatabaseHintSQLRouter
  解释sqlRouter:ParsingSQLRouter
 该步骤构造了sql执行所需的路由引擎和
-```
-##一、路由库和表
-```
-@Override
+</code></pre>
+
+<h2>一、路由库和表</h2>
+
+<pre><code>@Override
 public ResultSet executeQuery() throws SQLException {
         ResultSet result;
         try {
-            Collection<PreparedStatementUnit> preparedStatementUnits = route();
-            List<ResultSet> resultSets = new PreparedStatementExecutor(
+            Collection&lt;PreparedStatementUnit&gt; preparedStatementUnits = route();
+            List&lt;ResultSet&gt; resultSets = new PreparedStatementExecutor(
                     getConnection().getShardingContext().getExecutorEngine(), routeResult.getSqlStatement().getType(), preparedStatementUnits, getParameters()).executeQuery();
             result = new ShardingResultSet(resultSets, new MergeEngine(resultSets, (SelectStatement) routeResult.getSqlStatement()).merge(), this);
         } finally {
@@ -164,15 +240,15 @@ public ResultSet executeQuery() throws SQLException {
    routeResult = routingEngine.route(getParameters());
 
     @Override
-    public SQLRouteResult route(final String logicSQL, final List<Object> parameters, final SQLStatement sqlStatement) {
+    public SQLRouteResult route(final String logicSQL, final List&lt;Object&gt; parameters, final SQLStatement sqlStatement) {
         SQLRouteResult result = new SQLRouteResult(sqlStatement);
-        if (sqlStatement instanceof InsertStatement && null != ((InsertStatement) sqlStatement).getGeneratedKey()) {
+        if (sqlStatement instanceof InsertStatement &amp;&amp; null != ((InsertStatement) sqlStatement).getGeneratedKey()) {
             processGeneratedKey(parameters, (InsertStatement) sqlStatement, result);
         }
         RoutingResult routingResult = route(parameters, sqlStatement);
         SQLRewriteEngine rewriteEngine = new SQLRewriteEngine(shardingRule, logicSQL, databaseType, sqlStatement);
         boolean isSingleRouting = routingResult.isSingleRouting();
-        if (sqlStatement instanceof SelectStatement && null != ((SelectStatement) sqlStatement).getLimit()) {
+        if (sqlStatement instanceof SelectStatement &amp;&amp; null != ((SelectStatement) sqlStatement).getLimit()) {
             processLimit(parameters, (SelectStatement) sqlStatement, isSingleRouting);
         }
         SQLBuilder sqlBuilder = rewriteEngine.rewrite(!isSingleRouting);
@@ -237,12 +313,13 @@ public SQLStatement parse() {
         parseSelectRest();
     }
 这里大部分调用lexerEngine中的方法进行sql词法解析：
-```
-##路由之后执行准备sql预处理
-```
-for (SQLExecutionUnit each : routeResult.getExecutionUnits()) {
+</code></pre>
+
+<h2>路由之后执行准备sql预处理</h2>
+
+<pre><code>for (SQLExecutionUnit each : routeResult.getExecutionUnits()) {
    SQLType sqlType = routeResult.getSqlStatement().getType();
-   Collection<PreparedStatement> preparedStatements;
+   Collection&lt;PreparedStatement&gt; preparedStatements;
    //事务类型的sql，单独处理
    if (SQLType.DDL == sqlType) {
        preparedStatements = generatePreparedStatementForDDL(each);
@@ -255,24 +332,34 @@ for (SQLExecutionUnit each : routeResult.getExecutionUnits()) {
        result.add(new PreparedStatementUnit(each, preparedStatement));
    }
 }
-```
-##二、创建sql处理器并执行sql
-```
- List<ResultSet> resultSets = new PreparedStatementExecutor(
+</code></pre>
+
+<h2>二、创建sql处理器并执行sql</h2>
+
+<pre><code> List&lt;ResultSet&gt; resultSets = new PreparedStatementExecutor(
                     getConnection().getShardingContext().getExecutorEngine(), routeResult.getSqlStatement().getType(), preparedStatementUnits, getParameters())
                     .executeQuery();
-```
-##二、结果归并处理
-```
-result = new ShardingResultSet(resultSets, new MergeEngine(resultSets, (SelectStatement) routeResult.getSqlStatement()).merge(), this);
+</code></pre>
+
+<h2>二、结果归并处理</h2>
+<pre><code>result = new ShardingResultSet(resultSets, new MergeEngine(resultSets, (SelectStatement) routeResult.getSqlStatement()).merge(), this);
 回调，jdbc底层执行sql，并处理结果集
-return executorEngine.executePreparedStatement(sqlType, preparedStatementUnits, parameters, new ExecuteCallback<ResultSet>() {
+return executorEngine.executePreparedStatement(sqlType, preparedStatementUnits, parameters, new ExecuteCallback&lt;ResultSet&gt;() {
             @Override
             public ResultSet execute(final BaseStatementUnit baseStatementUnit) throws Exception {
                 return ((PreparedStatement) baseStatementUnit.getStatement()).executeQuery();
             }
         });
-```
+</code></pre>
+  </div>
+</body>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-106796420-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+  gtag('config', 'UA-106796420-1');
+</script>
 
-
-
+</html>
